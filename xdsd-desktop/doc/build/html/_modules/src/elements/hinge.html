@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>src.elements.hinge &mdash; DSDui  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> DSDui
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mainmodules.html">Main modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DSDui</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>src.elements.hinge</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for src.elements.hinge</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">radians</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QGraphicsItem</span>
+
+<span class="kn">from</span> <span class="nn">src.elements.element</span> <span class="kn">import</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">src.utils.config</span> <span class="kn">import</span> <span class="n">DOMAIN_LEN</span><span class="p">,</span> <span class="n">get_id</span><span class="p">,</span> <span class="n">get_vector_length</span><span class="p">,</span> <span class="n">euclidean_dist</span>
+
+
+<div class="viewcode-block" id="Hinge"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge">[docs]</a><span class="k">class</span> <span class="nc">Hinge</span><span class="p">(</span><span class="n">Element</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strand_id</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">prev_domain</span><span class="p">,</span> <span class="n">next_domain</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">get_id</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strand_id</span> <span class="o">=</span> <span class="n">strand_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span> <span class="o">=</span> <span class="n">prev_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span> <span class="o">=</span> <span class="n">next_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Hinge.move_first_hinge"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.move_first_hinge">[docs]</a>    <span class="k">def</span> <span class="nf">move_first_hinge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">move_vector</span><span class="p">):</span>
+        <span class="n">new_position</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span> <span class="o">=</span> <span class="n">new_position</span><span class="p">[:]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">end</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Hinge.move_hinge"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.move_hinge">[docs]</a>    <span class="k">def</span> <span class="nf">move_hinge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_move_position</span><span class="p">,</span> <span class="n">new_move_position</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Response move to the movement of the neighboring, leading hinge</span>
+<span class="sd">        :param old_move_position: Old position of the leading hinge</span>
+<span class="sd">        :param new_move_position: New position of the leading hinge</span>
+<span class="sd">        :param anchor: Position of the anchor of the vector determining the new position</span>
+<span class="sd">        :param side: 1 if this hinge is a next one with respect to the leading hinge,</span>
+<span class="sd">                    -1 if it is the previous one</span>
+<span class="sd">        :param factor: Multiplication factor determining the strength of the move</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">move_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">new_move_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_move_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                       <span class="n">factor</span> <span class="o">*</span> <span class="p">(</span><span class="n">new_move_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">old_move_position</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">moved_position</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">move_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">moved_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">moved_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">vector_length</span> <span class="o">=</span> <span class="n">get_vector_length</span><span class="p">(</span><span class="n">move_vector</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">side</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;Loop&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="p">(</span><span class="n">side</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;Loop&#39;</span><span class="p">):</span>
+            <span class="c1"># if the domain closer to the leading hinge is not a part of a loop</span>
+            <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">move_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">domain_len</span> <span class="o">/</span> <span class="n">vector_length</span><span class="p">,</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">domain_len</span> <span class="o">/</span> <span class="n">vector_length</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">move_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">domain_len</span> <span class="o">/</span> <span class="n">vector_length</span><span class="p">,</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">domain_len</span> <span class="o">/</span> <span class="n">vector_length</span><span class="p">]</span>
+
+            <span class="n">new_position</span> <span class="o">=</span> <span class="p">[</span><span class="n">anchor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span> <span class="o">=</span> <span class="n">new_position</span><span class="p">[:]</span>
+
+            <span class="n">new_direction</span> <span class="o">=</span> <span class="p">[</span><span class="n">side</span> <span class="o">*</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">side</span> <span class="o">*</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">new_center</span> <span class="o">=</span> <span class="p">[</span><span class="n">anchor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">side</span> <span class="o">*</span> <span class="n">new_direction</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">side</span> <span class="o">*</span> <span class="n">new_direction</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+            <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_coordinates</span><span class="p">(</span><span class="n">new_center</span><span class="p">,</span> <span class="n">new_direction</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_coordinates</span><span class="p">(</span><span class="n">new_center</span><span class="p">,</span> <span class="n">new_direction</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if it is a part of a loop</span>
+            <span class="c1"># check if the distance between the hinges does not exceed  the maximum</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                <span class="n">max_gap_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">loop_len</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">max_gap_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">loop_len</span>
+            <span class="c1"># shorten the vector if necessary</span>
+            <span class="k">if</span> <span class="n">vector_length</span> <span class="o">&gt;</span> <span class="n">max_gap_length</span><span class="p">:</span>
+                <span class="n">move_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_gap_length</span> <span class="o">/</span> <span class="n">vector_length</span><span class="p">,</span>
+                               <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_gap_length</span> <span class="o">/</span> <span class="n">vector_length</span><span class="p">]</span>
+
+            <span class="n">new_position</span> <span class="o">=</span> <span class="p">[</span><span class="n">anchor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span> <span class="o">=</span> <span class="n">new_position</span><span class="p">[:]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">end</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Hinge.rotate"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.rotate">[docs]</a>    <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">pivot</span><span class="p">,</span> <span class="n">side</span><span class="p">,</span> <span class="n">anchor</span><span class="p">):</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">radians</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pivot</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pivot</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">+</span> <span class="n">pivot</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">pivot</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">pivot</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span> <span class="o">+</span> <span class="n">pivot</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span>
+
+        <span class="n">move_vector</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">-</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span> <span class="o">-</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="n">new_direction</span> <span class="o">=</span> <span class="p">[</span><span class="n">side</span> <span class="o">*</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">side</span> <span class="o">*</span> <span class="n">move_vector</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="n">new_center</span> <span class="o">=</span> <span class="p">[</span><span class="n">anchor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">side</span> <span class="o">*</span> <span class="n">new_direction</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">anchor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">side</span> <span class="o">*</span> <span class="n">new_direction</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">side</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;Loop&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                <span class="p">(</span><span class="n">side</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">!=</span> <span class="s1">&#39;Loop&#39;</span><span class="p">):</span>
+            <span class="c1"># if the domain closer to the leading hinge is not a part of a loop</span>
+            <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_coordinates</span><span class="p">(</span><span class="n">new_center</span><span class="p">,</span> <span class="n">new_direction</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_coordinates</span><span class="p">(</span><span class="n">new_center</span><span class="p">,</span> <span class="n">new_direction</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if it is a part of a loop</span>
+            <span class="c1"># check if the distance between the hinges does not exceed  the maximum</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;Loop&#39;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="n">anchor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">set_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">new_position</span><span class="p">,</span> <span class="n">anchor</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Hinge.get_next_center"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_next_center">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span><span class="o">.</span><span class="n">get_center</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Hinge.get_prev_center"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_prev_center">[docs]</a>    <span class="k">def</span> <span class="nf">get_prev_center</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span><span class="o">.</span><span class="n">get_center</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Hinge.set_new_position"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.set_new_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_new_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[:]</span></div>
+
+<div class="viewcode-block" id="Hinge.get_new_position"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_new_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_new_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_position</span></div>
+
+<div class="viewcode-block" id="Hinge.set_position"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.set_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[:]</span></div>
+
+<div class="viewcode-block" id="Hinge.get_position"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span></div>
+
+<div class="viewcode-block" id="Hinge.get_strand_id"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_strand_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_strand_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">strand_id</span></div>
+
+<div class="viewcode-block" id="Hinge.get_prev_domain"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_prev_domain">[docs]</a>    <span class="k">def</span> <span class="nf">get_prev_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">prev_domain</span></div>
+
+<div class="viewcode-block" id="Hinge.get_next_domain"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.Hinge.get_next_domain">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_domain</span></div></div>
+
+
+<div class="viewcode-block" id="HingeGraphicsItem"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.HingeGraphicsItem">[docs]</a><span class="k">class</span> <span class="nc">HingeGraphicsItem</span><span class="p">(</span><span class="n">QGraphicsItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hinge</span><span class="p">):</span>
+        <span class="n">QGraphicsItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hinge</span> <span class="o">=</span> <span class="n">hinge</span>
+
+<div class="viewcode-block" id="HingeGraphicsItem.boundingRect"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.HingeGraphicsItem.boundingRect">[docs]</a>    <span class="k">def</span> <span class="nf">boundingRect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">QRectF</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hinge</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">hinge</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hinge</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span>
+                      <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">hinge</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="HingeGraphicsItem.paint"><a class="viewcode-back" href="../../../src.elements.html#src.elements.hinge.HingeGraphicsItem.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setBrush</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawEllipse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hinge</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">hinge</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Malgorzata Nowicka
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
