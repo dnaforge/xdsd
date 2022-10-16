@@ -1,6 +1,6 @@
 #!/bin/bash
 echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
-echo "conda activate dsdui" >> ~/.bashrc
+echo "conda activate xdsd" >> ~/.bashrc
 #lxterminal &
 
 #if [ -z ${STARTUPDATA} ]; then
@@ -12,6 +12,6 @@ echo "conda activate dsdui" >> ~/.bashrc
 # Start ProMo in the command-line (requires user input)
 lxterminal \
     --working-directory=../../xdsd_home/xdsd \
-    --command='python3 ../../xdsd_home/xdsd/main.py' \
-    --title='DSDPy' \
+    --command='python3 ../../xdsd_home/xdsd/xdsdApp.py' \
+    --title='XDSD' \
     &
