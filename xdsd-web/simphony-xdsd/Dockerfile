@@ -39,7 +39,7 @@ RUN apt-get install -y \
 
 RUN apt-get install -y python3-venv
 
-# Set up ProMo directory hierarchy
+# Set up xdsd directory hierarchy
 RUN mkdir /xdsd_home
 RUN mkdir /xdsd_home/xdsd
 
@@ -56,33 +56,31 @@ RUN chmod 755 /etc/skel/.config/openbox/autostart
 
 
 ENV PATH /opt/conda/bin:$PATH
-ENV PATH /opt/conda/envs/dsdui/bin:$PATH
+ENV PATH /opt/conda/envs/xdsd/bin:$PATH
 
+#Install conda
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O ~/miniconda.sh --no-check-certificate && /bin/bash ~/miniconda.sh -b -p /opt/conda
 RUN rm ~/miniconda.sh
 
-
+#Update conda
 RUN conda update -n base -c defaults conda
 
+# activate conda base env
 RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
 RUN echo "conda activate base" >> ~/.bashrc
 
+# create xdsd conda virtual env 
 RUN conda env create -f /xdsd_home/environment.yml
+# activate xdsd conda virtual env 
+RUN echo "conda activate xdsd" >> ~/.bashrc
 
-RUN echo "conda activate dsdui" >> ~/.bashrc
-
-
-SHELL ["conda", "run", "-n", "dsdui", "/bin/bash", "-c"]
-
-# Create env
-#RUN conda --version \
-#  && conda env create -f /xdsd_home/environment.yml \
-#  && source activate dsdui
+# activate xdsd env for new bash-shell launch
+SHELL ["conda", "run", "-n", "xdsd", "/bin/bash", "-c"]
 
 # activate env
 RUN conda --version \
   && conda install -c conda-forge pyqt \
-  && source activate dsdui
+  && source activate xdsd
 
 
 
