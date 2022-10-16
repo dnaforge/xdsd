@@ -1,0 +1,15 @@
+name: dsdui
+channels:
+  - anaconda
+  - alubbock
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - bidict
+  - pysb
+  - networkx
+  - matplotlib
+  - pyqt
+  - graphviz
+  - pygraphviz

@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; DSDui  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Main modules" href="mainmodules.html" />
+    <link rel="prev" title="DSDui documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> DSDui
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisities">Prerequisities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-program">Run program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#input">Input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation">Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mainmodules.html">Main modules</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DSDui</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Tutorial</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisities">
+<h2>Prerequisities<a class="headerlink" href="#prerequisities" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>To create the Anaconda environment:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
+<span class="p">(</span><span class="n">dsdui</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">dot</span> <span class="o">-</span><span class="n">c</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Manual installation:</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">alubbock</span> <span class="n">pysb</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">networkx</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">matplotlib</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">anaconda</span> <span class="n">pyqt</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">bidict</span>
+<span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">alubbock</span> <span class="n">graphviz</span> <span class="n">pygraphviz</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="run-program">
+<h2>Run program<a class="headerlink" href="#run-program" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Upon running the program a standalone application appears:</p>
+<div class="figure align-center" id="id1">
+<img alt="_images/tutorial.png" src="_images/tutorial.png" />
+<p class="caption"><span class="caption-text">DSDPy user interface</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="input">
+<h3>Input<a class="headerlink" href="#input" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>DSD model</strong> tab accepts the text input in the form described in <a class="reference external" href="https://dsdpy.readthedocs.io/en/latest/tutorial.html#creating-your-own-input">DSDPy manual</a>.</p></li>
+</ol>
+<ul class="simple">
+<li><p>choose if the parsing algorithm should be able to: permute the strands, flip the strands, flip the domains</p></li>
+<li><p>choose if the dots, denoting the destination of the pair, should be displayed</p></li>
+</ul>
+<div class="figure align-center" id="id2">
+<img alt="_images/dsd_model.png" src="_images/dsd_model.png" />
+<p class="caption"><span class="caption-text">DSD model tab</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Options</strong> tab provides settings for:</p></li>
+</ol>
+<ul class="simple">
+<li><p>threshold of iterations in reaction network generation</p></li>
+<li><p>rendering speed - the greater the speed, the quicker and less accurate the output rendering (default settings: exponentially increasing for simple species, linearly increasing for pseudoknots)</p></li>
+<li><p>render button starts the rendering of the current view</p></li>
+</ul>
+<div class="figure align-center" id="id3">
+<img alt="_images/options.png" src="_images/options.png" />
+<p class="caption"><span class="caption-text">Options tab</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="simulation">
+<h3>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center" id="id4">
+<img alt="_images/generate_simulate.png" src="_images/generate_simulate.png" />
+<p class="caption"><span class="caption-text">Simulation buttons group</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple">
+<li><p><strong>Generate</strong> button starts the reaction network generation</p></li>
+<li><p><strong>Simulate</strong> button starts the simulation - choose the mode from the combo box (stochastic / deterministic)</p></li>
+</ol>
+</div>
+<div class="section" id="output">
+<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Input view</strong> tab displays the parsed input species to the DSDPy. <strong>Output view</strong> tab displays the parsed output species from the DSDPy.</p></li>
+</ol>
+<ul class="simple">
+<li><p><strong>Render</strong> button starts the rendering of the current view</p></li>
+<li><p>choose the input and output of the render from the combo box</p></li>
+<li><p>save the views as a PNG with save button</p></li>
+</ul>
+<div class="figure align-center" id="id5">
+<img alt="_images/render.png" src="_images/render.png" />
+<p class="caption"><span class="caption-text">DSD species before rendering</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id6">
+<img alt="_images/render_done.png" src="_images/render_done.png" />
+<p class="caption"><span class="caption-text">DSD species after rendering</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Network</strong> tab displays the chemical reaction network</p></li>
+</ol>
+<ul class="simple">
+<li><p>choose the network layout from the options in the combo box</p></li>
+<li><p>zoom and pan to navigate through the network</p></li>
+</ul>
+<div class="figure align-center" id="id7">
+<img alt="_images/network.png" src="_images/network.png" />
+<p class="caption"><span class="caption-text">Network tab after clicking Generate button</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>click on the species’ name to view the species</p></li>
+<li><p>click on the reaction name to view the reactants, products and reaction rate of the reaction</p></li>
+</ul>
+<div class="figure align-center" id="id8">
+<img alt="_images/reaction.png" src="_images/reaction.png" />
+<p class="caption"><span class="caption-text">Reaction window after clicking on a reaction node</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><strong>Simulation plot</strong> tab displays BNG simulation plot</p></li>
+</ol>
+<div class="figure align-center" id="id9">
+<img alt="_images/simulation.png" src="_images/simulation.png" />
+<p class="caption"><span class="caption-text">Simulation tab after clicking Simulate button</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><strong>Text output</strong> tab displays the text output from the DSDPy</p></li>
+</ol>
+<div class="figure align-center" id="id10">
+<img alt="_images/text.png" src="_images/text.png" />
+<p class="caption"><span class="caption-text">Text output tab after clicking Generate button</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mainmodules.html" class="btn btn-neutral float-right" title="Main modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="DSDui documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, Malgorzata Nowicka
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
