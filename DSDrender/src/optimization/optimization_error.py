@@ -1,2 +1,0 @@
-class OptimizationError(Exception):
-    pass
