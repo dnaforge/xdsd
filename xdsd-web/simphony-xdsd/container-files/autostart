@@ -1,6 +1,6 @@
 #!/bin/bash
 echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
-echo "conda activate DSDrender" >> ~/.bashrc
+echo "conda activate DSDui" >> ~/.bashrc
 #lxterminal &
 
 #if [ -z ${STARTUPDATA} ]; then
