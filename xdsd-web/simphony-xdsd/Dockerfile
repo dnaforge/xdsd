@@ -56,7 +56,7 @@ RUN chmod 755 /etc/skel/.config/openbox/autostart
 
 
 ENV PATH /opt/conda/bin:$PATH
-ENV PATH /opt/conda/envs/dsdui/bin:$PATH
+ENV PATH /opt/conda/envs/DSDrender/bin:$PATH
 
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh -O ~/miniconda.sh --no-check-certificate && /bin/bash ~/miniconda.sh -b -p /opt/conda
 RUN rm ~/miniconda.sh
@@ -69,20 +69,20 @@ RUN echo "conda activate base" >> ~/.bashrc
 
 RUN conda env create -f /xdsd_home/environment.yml
 
-RUN echo "conda activate dsdui" >> ~/.bashrc
+RUN echo "conda activate DSDrender" >> ~/.bashrc
 
 
-SHELL ["conda", "run", "-n", "dsdui", "/bin/bash", "-c"]
+SHELL ["conda", "run", "-n", "DSDrender", "/bin/bash", "-c"]
 
 # Create env
 #RUN conda --version \
 #  && conda env create -f /xdsd_home/environment.yml \
-#  && source activate dsdui
+#  && source activate DSDrender
 
 # activate env
 RUN conda --version \
   && conda install -c conda-forge pyqt \
-  && source activate dsdui
+  && source activate DSDrender
 
 
 

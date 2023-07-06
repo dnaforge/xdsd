@@ -9,7 +9,7 @@ Prerequisities
 ::
 
     conda env create -f environment.yml
-    (dsdui) > dot -c
+    (DSDrender) > dot -c
 
 
 * Manual installation:

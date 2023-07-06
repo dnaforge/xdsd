@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 
 
 # -- Project information -----------------------------------------------------
-# We should try to replace DSDui -> XDSD
+# We should try to replace DSDrender -> XDSD
 project = 'XDSD'
 
 # # The short X.Y version.

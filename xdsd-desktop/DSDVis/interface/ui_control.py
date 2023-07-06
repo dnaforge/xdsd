@@ -41,7 +41,7 @@ class UiControl(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def __init__(self, *args, obj=None, **kwargs):
         ############
-        # DSDui
+        # DSDrender
         ############
         super(UiControl, self).__init__()
         self.setupUi(self)
@@ -310,7 +310,7 @@ class UiControl(QtWidgets.QMainWindow, Ui_MainWindow):
         self.print_log("Generating species stopped")
 
     ############
-    # DSDui
+    # DSDrender
     ############
 
     def add_species_to_scene(self, view, species_dict):

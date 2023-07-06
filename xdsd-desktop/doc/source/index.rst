@@ -1,11 +1,11 @@
-.. DSDui documentation master file, created by
+.. DSDrender documentation master file, created by
    sphinx-quickstart on Thu Oct 15 15:57:07 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-DSDui documentation
+DSDrender documentation
 =================================
-DSDui is a graphical user interface for `DSDPy <https://github.com/ashleylst/DSDPy>`__ package.
+DSDrender is a graphical user interface for `DSDPy <https://github.com/ashleylst/DSDPy>`__ package.
 
 .. toctree::
    :maxdepth: 4

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.interface.ui_control &mdash; DSDrender  documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> DSDrender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mainmodules.html">Main modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DSDrender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.interface.ui_control</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.interface.ui_control</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Event</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtWidgets</span><span class="p">,</span> <span class="n">QtGui</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">QThreadPool</span><span class="p">,</span> <span class="n">QSize</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">QPoint</span><span class="p">,</span> <span class="n">QLineF</span><span class="p">,</span> <span class="n">QPointF</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="kn">import</span> <span class="n">QTransform</span><span class="p">,</span> <span class="n">QPainter</span><span class="p">,</span> <span class="n">QPen</span><span class="p">,</span> <span class="n">QColor</span><span class="p">,</span> <span class="n">QFont</span><span class="p">,</span> <span class="n">QPainterPath</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtSvg</span> <span class="kn">import</span> <span class="n">QSvgGenerator</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QGraphicsScene</span><span class="p">,</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QGraphicsItemGroup</span><span class="p">,</span> <span class="n">QGraphicsSimpleTextItem</span><span class="p">,</span> \
+    <span class="n">QGraphicsItem</span><span class="p">,</span> <span class="n">QGraphicsEllipseItem</span><span class="p">,</span> <span class="n">QGraphicsLineItem</span><span class="p">,</span> <span class="n">QApplication</span><span class="p">,</span> <span class="n">QGraphicsPathItem</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt5agg</span> <span class="kn">import</span> <span class="n">NavigationToolbar2QT</span> <span class="k">as</span> <span class="n">NavigationToolbar</span>
+
+<span class="kn">from</span> <span class="nn">DSDPy.src.basics</span> <span class="kn">import</span> <span class="n">graph_processor</span><span class="p">,</span> <span class="n">output</span>
+<span class="kn">from</span> <span class="nn">DSDPy.src.util.cexception</span> <span class="kn">import</span> <span class="n">SpeciesError</span>
+<span class="kn">from</span> <span class="nn">DSDPy.src.util.model</span> <span class="kn">import</span> <span class="n">Model</span>
+<span class="kn">from</span> <span class="nn">src.elements.element</span> <span class="kn">import</span> <span class="n">get_element</span>
+<span class="kn">from</span> <span class="nn">src.elements.overhang</span> <span class="kn">import</span> <span class="n">Overhang</span><span class="p">,</span> <span class="n">OverhangGraphicsItem</span>
+<span class="kn">from</span> <span class="nn">src.interface.progress_window</span> <span class="kn">import</span> <span class="n">ProgressWindow</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">sip</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sip</span>
+
+<span class="kn">from</span> <span class="nn">src.elements.domain</span> <span class="kn">import</span> <span class="n">DomainGraphicsItem</span><span class="p">,</span> <span class="n">BondGraphicsItem</span><span class="p">,</span> <span class="n">Domain</span>
+<span class="kn">from</span> <span class="nn">src.elements.loop</span> <span class="kn">import</span> <span class="n">LoopGraphicsItem</span><span class="p">,</span> <span class="n">Loop</span>
+<span class="kn">from</span> <span class="nn">src.interface.processor_thread</span> <span class="kn">import</span> <span class="n">ProcessorThread</span>
+<span class="kn">from</span> <span class="nn">src.interface.reaction_window</span> <span class="kn">import</span> <span class="n">ReactionWindow</span><span class="p">,</span> <span class="n">ReactionArrowGraphicsItem</span>
+<span class="kn">from</span> <span class="nn">src.interface.species_window</span> <span class="kn">import</span> <span class="n">SpeciesWindow</span>
+<span class="kn">from</span> <span class="nn">src.interface.ui</span> <span class="kn">import</span> <span class="n">Ui_MainWindow</span>
+<span class="kn">from</span> <span class="nn">src.model.ui_model</span> <span class="kn">import</span> <span class="n">UiModel</span>
+<span class="kn">import</span> <span class="nn">src.utils.config</span>
+<span class="kn">from</span> <span class="nn">src.utils.network_generation</span> <span class="kn">import</span> <span class="n">parse_network</span><span class="p">,</span> <span class="n">NetworkViewer</span>
+
+
+<div class="viewcode-block" id="UiControl"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl">[docs]</a><span class="k">class</span> <span class="nc">UiControl</span><span class="p">(</span><span class="n">QtWidgets</span><span class="o">.</span><span class="n">QMainWindow</span><span class="p">,</span> <span class="n">Ui_MainWindow</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Controller class for managing the user interaction with the view</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">close_detached_windows</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">obj</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1">############</span>
+        <span class="c1"># DSDrender</span>
+        <span class="c1">############</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UiControl</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setupUi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s1">&#39;DSDrender&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span> <span class="o">=</span> <span class="n">UiModel</span><span class="p">()</span>
+
+        <span class="c1"># add a network viewer for network generating</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span> <span class="o">=</span> <span class="n">NetworkViewer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_view</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_view</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;background-color:white;&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizing</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_thread_pool</span> <span class="o">=</span> <span class="n">QThreadPool</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_window</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_colors</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_view</span><span class="o">.</span><span class="n">setScene</span><span class="p">(</span><span class="n">QGraphicsScene</span><span class="p">())</span>
+
+        <span class="c1"># bindings for ui elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_text</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_output_save</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_output</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_save</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_img_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas_view</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_save_2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_img_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas_view_2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas_save_3</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_svg_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_slider</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_slider_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold_slider2</span><span class="o">.</span><span class="n">valueChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">set_slider_value2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_species_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_button2</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_species_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">species_node_clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_species_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">reaction_node_clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_reaction_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">viewport_moved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reset_species_combo</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_combo</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">change_network_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_combo</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">change_viewed_species</span><span class="p">)</span>
+        <span class="c1"># self.straight_checkbox.stateChanged.connect(self.change_layout)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">straight_radio</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">straight_radio</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ortho_radio</span><span class="o">.</span><span class="n">toggled</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">straight_radio</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()))</span>
+
+        <span class="c1">############</span>
+        <span class="c1"># DSDPy</span>
+        <span class="c1">############</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simuarg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simumode</span> <span class="o">=</span> <span class="s1">&#39;bng&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paused</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_stopped</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_combo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># bindings for ui elements</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">simulate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_combo</span><span class="o">.</span><span class="n">currentIndexChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">change_simulation_mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_stop_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_stop</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_block</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_lock</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">showMaximized</span><span class="p">()</span>
+
+    <span class="c1">############</span>
+    <span class="c1"># DSDPy</span>
+    <span class="c1">############</span>
+
+<div class="viewcode-block" id="UiControl.generate"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.generate">[docs]</a>    <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback for Generate button click</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">code_text</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">,</span> <span class="n">initnames</span><span class="p">,</span> <span class="n">concentrations</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">simupara</span><span class="p">,</span> <span class="n">initlen</span> <span class="o">=</span> <span class="n">graph_processor</span><span class="o">.</span><span class="n">initiation</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s1">&#39;Incorrect input&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="n">SpeciesError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s1">&#39;Processing error&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simuarg</span> <span class="o">=</span> <span class="p">(</span><span class="n">initnames</span><span class="p">,</span> <span class="n">concentrations</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">simupara</span><span class="p">,</span> <span class="n">initlen</span><span class="p">)</span>
+
+        <span class="n">event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span> <span class="o">=</span> <span class="n">ProcessorThread</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold_slider</span><span class="o">.</span><span class="n">value</span><span class="p">()),</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_stop</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">info</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">setDaemon</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">get_lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">paused</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_stopped</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="c1"># show results when finished</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">initnames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">my_signal</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">show_generate_results</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.show_generate_results"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.show_generate_results">[docs]</a>    <span class="k">def</span> <span class="nf">show_generate_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">specieslist</span><span class="p">,</span> <span class="n">speciesidmap</span><span class="p">,</span> <span class="n">reactionlist</span><span class="p">,</span> <span class="n">kinetics</span><span class="p">,</span> <span class="n">indexlist</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">visited</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">get_arg_info</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">graph_processor</span><span class="o">.</span><span class="n">post_enumeration</span><span class="p">(</span><span class="n">specieslist</span><span class="p">,</span> <span class="n">reactionlist</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s1">&#39;Generation Error&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_output</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s1">&#39;Generation finished&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_toolbar</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_unlock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_unlock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_output_species</span><span class="p">()</span>
+        <span class="n">graph</span><span class="p">,</span> <span class="n">species_ids</span> <span class="o">=</span> <span class="n">parse_network</span><span class="p">(</span><span class="n">specieslist</span><span class="p">,</span> <span class="n">reactionlist</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_species_combo</span><span class="p">(</span><span class="n">species_ids</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_network</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">species_ids</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.set_species_combo"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.set_species_combo">[docs]</a>    <span class="k">def</span> <span class="nf">set_species_combo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_ids</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">species_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">species_ids</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;ss&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;sp_&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">species_combo</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">species_id</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UiControl.change_network_layout"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.change_network_layout">[docs]</a>    <span class="k">def</span> <span class="nf">change_network_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">change_network_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">network_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.change_viewed_species"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.change_viewed_species">[docs]</a>    <span class="k">def</span> <span class="nf">change_viewed_species</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">change_focus_species</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">species_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.show_network"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.show_network">[docs]</a>    <span class="k">def</span> <span class="nf">show_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">species_ids</span><span class="p">):</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">set_network</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">species_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">network_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">(),</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.generate_lock"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.generate_lock">[docs]</a>    <span class="k">def</span> <span class="nf">generate_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_stop_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.generate_block"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.generate_block">[docs]</a>    <span class="k">def</span> <span class="nf">generate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_stop_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.simulate_lock"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.simulate_lock">[docs]</a>    <span class="k">def</span> <span class="nf">simulate_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_combo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.generate_unlock"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.generate_unlock">[docs]</a>    <span class="k">def</span> <span class="nf">generate_unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_stop_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.simulate_unlock"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.simulate_unlock">[docs]</a>    <span class="k">def</span> <span class="nf">simulate_unlock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread_stopped</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulate_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simulate_combo</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.simulate"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callback for Simulate button click</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">specieslist</span><span class="p">,</span> <span class="n">speciesidmap</span><span class="p">,</span> <span class="n">reactionlist</span><span class="p">,</span> <span class="n">kinetics</span><span class="p">,</span> <span class="n">indexlist</span><span class="p">,</span> <span class="n">cursor</span><span class="p">,</span> <span class="n">visited</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">get_arg_info</span><span class="p">()</span>
+        <span class="n">initnames</span><span class="p">,</span> <span class="n">concentrations</span><span class="p">,</span> <span class="n">outdir</span><span class="p">,</span> <span class="n">simupara</span><span class="p">,</span> <span class="n">initlen</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simuarg</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">obs</span> <span class="o">=</span> <span class="n">graph_processor</span><span class="o">.</span><span class="n">simulation</span><span class="p">(</span><span class="n">specieslist</span><span class="p">,</span> <span class="n">reactionlist</span><span class="p">,</span> <span class="n">initlen</span><span class="p">,</span> <span class="n">initnames</span><span class="p">,</span> <span class="n">concentrations</span><span class="p">,</span>
+                                                   <span class="n">outdir</span><span class="p">,</span> <span class="n">simupara</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">simumode</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s1">&#39;Simulation error&#39;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">display_output_img</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">simumode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.display_output_img"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.display_output_img">[docs]</a>    <span class="k">def</span> <span class="nf">display_output_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;tab10&#39;</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="s1">&#39;bng&#39;</span><span class="p">):</span>
+        <span class="n">obslen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sc</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">96</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">sc</span>
+            <span class="n">toolbar</span> <span class="o">=</span> <span class="n">NavigationToolbar</span><span class="p">(</span><span class="n">sc</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">QtWidgets</span><span class="o">.</span><span class="n">QVBoxLayout</span><span class="p">()</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">toolbar</span><span class="p">)</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">sc</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">graph_widget</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">colormap</span><span class="p">,</span> <span class="n">obslen</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">obslen</span><span class="p">):</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">obs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
+            <span class="k">if</span> <span class="n">option</span> <span class="o">==</span> <span class="s1">&#39;bng&#39;</span><span class="p">:</span>
+                <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">[:,</span> <span class="n">i</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">option</span> <span class="o">==</span> <span class="s1">&#39;scipy&#39;</span><span class="p">:</span>
+                <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">[</span><span class="n">obs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time (s)&quot;</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Complexes&quot;</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xmargin</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="n">sc</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_toolbar</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s1">&#39;Simulation plot finished&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.change_simulation_mode"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.change_simulation_mode">[docs]</a>    <span class="k">def</span> <span class="nf">change_simulation_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulate_combo</span><span class="o">.</span><span class="n">currentText</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;Stochastic&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simumode</span> <span class="o">=</span> <span class="s1">&#39;bng&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">simumode</span> <span class="o">=</span> <span class="s1">&#39;scipy&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s1">&#39;Simulation mode set to &#39;</span> <span class="o">+</span> <span class="n">mode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.generate_stop"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.generate_stop">[docs]</a>    <span class="k">def</span> <span class="nf">generate_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_unlock</span><span class="p">()</span>
+        <span class="c1"># self.optimization_unlock()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">raise_exception</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">procthread</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thread_stopped</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s2">&quot;Generating species stopped&quot;</span><span class="p">)</span></div>
+
+    <span class="c1">############</span>
+    <span class="c1"># DSDrender</span>
+    <span class="c1">############</span>
+
+<div class="viewcode-block" id="UiControl.build_path"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.build_path">[docs]</a>    <span class="k">def</span> <span class="nf">build_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+        <span class="c1"># https://stackoverflow.com/a/63019853</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">QPainterPath</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">cp1</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">current</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># previous segment</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">QLineF</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">p</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">current</span><span class="p">)</span>
+            <span class="c1"># next segment</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="n">QLineF</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="n">p</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">targetAngle</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">angleTo</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">targetAngle</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+                <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span> <span class="o">+</span> <span class="n">source</span><span class="o">.</span><span class="n">angleTo</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">angle</span><span class="p">()</span> <span class="o">+</span> <span class="n">target</span><span class="o">.</span><span class="n">angleTo</span><span class="p">(</span><span class="n">source</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">360</span>
+
+            <span class="n">revTarget</span> <span class="o">=</span> <span class="n">QLineF</span><span class="o">.</span><span class="n">fromPolar</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">length</span><span class="p">()</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="n">angle</span> <span class="o">+</span> <span class="mi">180</span><span class="p">)</span><span class="o">.</span><span class="n">translated</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            <span class="n">cp2</span> <span class="o">=</span> <span class="n">revTarget</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">quadTo</span><span class="p">(</span><span class="n">cp2</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># use the control point &quot;cp1&quot; set in the *previous* cycle</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">cubicTo</span><span class="p">(</span><span class="n">cp1</span><span class="p">,</span> <span class="n">cp2</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+
+            <span class="n">revSource</span> <span class="o">=</span> <span class="n">QLineF</span><span class="o">.</span><span class="n">fromPolar</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">length</span><span class="p">()</span> <span class="o">*</span> <span class="n">factor</span><span class="p">,</span> <span class="n">angle</span><span class="p">)</span><span class="o">.</span><span class="n">translated</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            <span class="n">cp1</span> <span class="o">=</span> <span class="n">revSource</span><span class="o">.</span><span class="n">p2</span><span class="p">()</span>
+
+        <span class="c1"># the final curve, that joins to the last point</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">quadTo</span><span class="p">(</span><span class="n">cp1</span><span class="p">,</span> <span class="n">points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">path</span></div>
+
+<div class="viewcode-block" id="UiControl.add_graph_to_scene_curve"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.add_graph_to_scene_curve">[docs]</a>    <span class="k">def</span> <span class="nf">add_graph_to_scene_curve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">species_dict</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Renders species on the given view</span>
+
+<span class="sd">        :param view: QGraphicsView object where the species will be rendered</span>
+<span class="sd">        :param species_dict: species to be rendered</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">species_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s2">&quot;Loaded species: &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">graph_group</span> <span class="o">=</span> <span class="n">QGraphicsItemGroup</span><span class="p">()</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">graph</span>
+            <span class="n">covalent_bonded</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">mid_connection</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">edge</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">):</span>
+                <span class="n">node1</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">source</span><span class="p">()</span>
+                <span class="n">node2</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+                <span class="n">point1</span> <span class="o">=</span> <span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">node1</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">node1</span><span class="p">))</span>
+                <span class="n">point2</span> <span class="o">=</span> <span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">node2</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">node2</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QPointF</span><span class="p">(</span><span class="n">point1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">point1</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+                <span class="n">connection_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">edge</span><span class="p">))</span>
+                <span class="c1"># hydrogen connection</span>
+                <span class="n">hydrogen_marker</span> <span class="o">=</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)</span>
+                <span class="n">covalent_marker</span> <span class="o">=</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span>
+                <span class="c1"># covalent connection</span>
+                <span class="k">if</span> <span class="n">covalent_marker</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">hydrogen_marker</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">hydrogen_marker</span> <span class="o">&gt;</span> <span class="n">covalent_marker</span><span class="p">:</span>
+                        <span class="n">connection</span> <span class="o">=</span> <span class="n">get_element</span><span class="p">(</span><span class="n">connection_id</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">hydrogen_marker</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">connection</span> <span class="o">=</span> <span class="n">get_element</span><span class="p">(</span><span class="n">connection_id</span><span class="p">[</span><span class="n">idx</span><span class="p">:])</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Loop</span><span class="p">:</span>
+                        <span class="n">mid_connection</span> <span class="o">=</span> <span class="p">[</span><span class="n">connection</span><span class="p">,</span> <span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="n">prev_point</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Domain</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mid_connection</span><span class="p">:</span>
+                            <span class="c1"># item = LoopGraphicsItem(mid_connection[0], mid_connection[1], mid_connection[2],</span>
+                            <span class="c1">#                         mid_connection[3], point2)</span>
+                            <span class="c1"># graph_group.addToGroup(item)</span>
+                            <span class="k">pass</span>
+                        <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">bond</span> <span class="ow">in</span> <span class="n">covalent_bonded</span><span class="p">:</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">BondGraphicsItem</span><span class="p">(</span><span class="n">covalent_bonded</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">bond</span><span class="p">],</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">],</span>
+                                                    <span class="n">connection</span><span class="o">.</span><span class="n">bond</span><span class="p">)</span>
+                            <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                            <span class="k">pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">covalent_bonded</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">bond</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">]</span>
+                        <span class="n">mid_connection</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+                        <span class="n">color</span><span class="o">.</span><span class="n">setNamedColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">get_name_stem</span><span class="p">()])</span>
+                        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QPointF</span><span class="p">(</span><span class="n">point2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">point2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="c1"># item = DomainGraphicsItem(point1, point2, color, connection.name, connection.last)</span>
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Overhang</span><span class="p">:</span>
+                        <span class="n">mid_connection</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="c1"># item = OverhangGraphicsItem(connection, point1, point2)</span>
+                        <span class="n">points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">QPointF</span><span class="p">(</span><span class="n">point2</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">point2</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+                <span class="c1"># graph_group.addToGroup(item)</span>
+                <span class="n">prev_point</span> <span class="o">=</span> <span class="n">point1</span>
+
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_path</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+            <span class="n">path_item</span> <span class="o">=</span> <span class="n">QGraphicsPathItem</span><span class="p">()</span>
+            <span class="n">path_item</span><span class="o">.</span><span class="n">setPath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">path_item</span><span class="p">)</span>
+
+            <span class="c1"># add species&#39; name</span>
+            <span class="n">name_item</span> <span class="o">=</span> <span class="n">QGraphicsSimpleTextItem</span><span class="p">(</span><span class="n">species</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">name_item</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">left</span><span class="p">()</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">top</span><span class="p">()</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="n">name_item</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QPen</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">))</span>
+            <span class="n">name_item</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span>
+            <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">name_item</span><span class="p">)</span>
+
+            <span class="c1"># move the species to the right height</span>
+            <span class="n">translate</span> <span class="o">=</span> <span class="n">QTransform</span><span class="p">()</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="o">-</span><span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">left</span><span class="p">()</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">top</span><span class="p">()</span>
+            <span class="n">dy</span> <span class="o">+=</span> <span class="n">height</span>
+            <span class="n">translate</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+            <span class="n">graph_group</span><span class="o">.</span><span class="n">setTransform</span><span class="p">(</span><span class="n">translate</span><span class="p">)</span>
+            <span class="n">height</span> <span class="o">+=</span> <span class="mf">1.25</span> <span class="o">*</span> <span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+            <span class="c1"># add species</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">graph_group</span><span class="p">)</span>
+
+        <span class="n">view</span><span class="o">.</span><span class="n">setScene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.add_graph_to_scene"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.add_graph_to_scene">[docs]</a>    <span class="k">def</span> <span class="nf">add_graph_to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">species_dict</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Renders species on the given view</span>
+
+<span class="sd">        :param view: QGraphicsView object where the species will be rendered</span>
+<span class="sd">        :param species_dict: species to be rendered</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">species_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s2">&quot;Loaded species: &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">graph_group</span> <span class="o">=</span> <span class="n">QGraphicsItemGroup</span><span class="p">()</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">graph</span>
+            <span class="n">prev_point</span> <span class="o">=</span> <span class="n">mid_connection</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">covalent_bonded</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
+                <span class="n">node1</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">source</span><span class="p">()</span>
+                <span class="n">node2</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">target</span><span class="p">()</span>
+                <span class="n">point1</span> <span class="o">=</span> <span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">node1</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">node1</span><span class="p">))</span>
+                <span class="n">point2</span> <span class="o">=</span> <span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">node2</span><span class="p">),</span> <span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">node2</span><span class="p">))</span>
+
+                <span class="n">connection_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">edge</span><span class="p">))</span>
+                <span class="c1"># hydrogen connection</span>
+                <span class="n">hydrogen_marker</span> <span class="o">=</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)</span>
+                <span class="n">covalent_marker</span> <span class="o">=</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span>
+                <span class="c1"># if hydrogen_marker != -1:</span>
+                <span class="c1">#     item = BondGraphicsItem(point1, point2, connection_id)</span>
+                <span class="c1">#     graph_group.addToGroup(item)</span>
+                <span class="c1"># covalent connection</span>
+                <span class="k">if</span> <span class="n">covalent_marker</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="n">connection_id</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">hydrogen_marker</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">hydrogen_marker</span> <span class="o">&gt;</span> <span class="n">covalent_marker</span><span class="p">:</span>
+                        <span class="n">connection</span> <span class="o">=</span> <span class="n">get_element</span><span class="p">(</span><span class="n">connection_id</span><span class="p">[</span><span class="n">idx</span><span class="p">:</span><span class="n">hydrogen_marker</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">connection</span> <span class="o">=</span> <span class="n">get_element</span><span class="p">(</span><span class="n">connection_id</span><span class="p">[</span><span class="n">idx</span><span class="p">:])</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Loop</span><span class="p">:</span>
+                        <span class="n">mid_connection</span> <span class="o">=</span> <span class="p">[</span><span class="n">connection</span><span class="p">,</span> <span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="n">prev_point</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Domain</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mid_connection</span><span class="p">:</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">LoopGraphicsItem</span><span class="p">(</span><span class="n">mid_connection</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mid_connection</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">mid_connection</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                                                    <span class="n">mid_connection</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">point2</span><span class="p">)</span>
+                            <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">bond</span> <span class="ow">in</span> <span class="n">covalent_bonded</span><span class="p">:</span>
+                            <span class="n">item</span> <span class="o">=</span> <span class="n">BondGraphicsItem</span><span class="p">(</span><span class="n">covalent_bonded</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">bond</span><span class="p">],</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">],</span>
+                                                    <span class="n">connection</span><span class="o">.</span><span class="n">bond</span><span class="p">)</span>
+                            <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                            <span class="c1"># pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">covalent_bonded</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">bond</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">]</span>
+                        <span class="n">mid_connection</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">()</span>
+                        <span class="n">color</span><span class="o">.</span><span class="n">setNamedColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">get_name_stem</span><span class="p">()])</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">DomainGraphicsItem</span><span class="p">(</span><span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">connection</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">connection</span><span class="o">.</span><span class="n">last</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">connection</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Overhang</span><span class="p">:</span>
+                        <span class="n">mid_connection</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">item</span> <span class="o">=</span> <span class="n">OverhangGraphicsItem</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">point1</span><span class="p">,</span> <span class="n">point2</span><span class="p">)</span>
+
+                <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">prev_point</span> <span class="o">=</span> <span class="n">point1</span>
+
+            <span class="c1"># vertices for the ends of the domains</span>
+            <span class="c1"># for node in graph.g.nodes:</span>
+            <span class="c1">#     item = QGraphicsEllipseItem(graph.ga.x(node)-3, graph.ga.y(node)-3, 6, 6)</span>
+            <span class="c1">#     brush = QBrush()</span>
+            <span class="c1">#     item.setBrush(Qt.black)</span>
+            <span class="c1">#     graph_group.addToGroup(item)</span>
+
+            <span class="c1"># desired position of the paired domains</span>
+            <span class="c1"># for node in graph.g.nodes:</span>
+            <span class="c1">#     pair_locations = graph.ga.label(node).split(&quot; &quot;)</span>
+            <span class="c1">#</span>
+            <span class="c1">#     i = 0</span>
+            <span class="c1">#     while i &lt; len(pair_locations)-1:</span>
+            <span class="c1">#         if len(pair_locations[i]) == 0 or pair_locations[i][0] == &#39;!&#39;:</span>
+            <span class="c1">#             i += 1</span>
+            <span class="c1">#             pass</span>
+            <span class="c1">#         item = QGraphicsEllipseItem(float(graph.ga.x(node))+float(pair_locations[i]), float(graph.ga.y(node))+float(pair_locations[i+1]), 6, 6)</span>
+            <span class="c1">#         item.setBrush(Qt.black)</span>
+            <span class="c1">#         graph_group.addToGroup(item)</span>
+            <span class="c1">#         item = QGraphicsLineItem(float(graph.ga.x(node)), float(graph.ga.y(node)),</span>
+            <span class="c1">#                                  float(graph.ga.x(node)) + float(pair_locations[i]),</span>
+            <span class="c1">#                                     float(graph.ga.y(node)) + float(pair_locations[i + 1]))</span>
+            <span class="c1">#         graph_group.addToGroup(item)</span>
+            <span class="c1">#         i += 2</span>
+
+            <span class="c1"># add species&#39; name</span>
+            <span class="n">name_item</span> <span class="o">=</span> <span class="n">QGraphicsSimpleTextItem</span><span class="p">(</span><span class="n">species</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">name_item</span><span class="o">.</span><span class="n">setPos</span><span class="p">(</span><span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">left</span><span class="p">()</span> <span class="o">-</span> <span class="mi">20</span><span class="p">,</span> <span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">top</span><span class="p">()</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="n">name_item</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">QPen</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">))</span>
+            <span class="n">name_item</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span>
+            <span class="n">graph_group</span><span class="o">.</span><span class="n">addToGroup</span><span class="p">(</span><span class="n">name_item</span><span class="p">)</span>
+
+            <span class="c1"># move the species to the right height</span>
+            <span class="n">translate</span> <span class="o">=</span> <span class="n">QTransform</span><span class="p">()</span>
+            <span class="n">dx</span> <span class="o">=</span> <span class="o">-</span><span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">left</span><span class="p">()</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="o">-</span><span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">top</span><span class="p">()</span>
+            <span class="n">dy</span> <span class="o">+=</span> <span class="n">height</span>
+            <span class="n">translate</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
+            <span class="n">graph_group</span><span class="o">.</span><span class="n">setTransform</span><span class="p">(</span><span class="n">translate</span><span class="p">)</span>
+            <span class="n">height</span> <span class="o">+=</span> <span class="mf">1.25</span> <span class="o">*</span> <span class="n">graph_group</span><span class="o">.</span><span class="n">boundingRect</span><span class="p">()</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+            <span class="c1"># add species</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">graph_group</span><span class="p">)</span>
+
+        <span class="n">view</span><span class="o">.</span><span class="n">setScene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.show_species"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.show_species">[docs]</a>    <span class="k">def</span> <span class="nf">show_species</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">,</span> <span class="n">species_dict</span><span class="p">):</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">QGraphicsScene</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_graph_to_scene</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">species_dict</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.show_input_species"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.show_input_species">[docs]</a>    <span class="k">def</span> <span class="nf">show_input_species</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">log</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">graph_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">parse_input_species</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code_text</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">(),</span>
+                                                                      <span class="bp">self</span><span class="o">.</span><span class="n">progress_window</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">show_species</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas_view</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">input_species_dict</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_errors</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_errors</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="UiControl.show_output_species"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.show_output_species">[docs]</a>    <span class="k">def</span> <span class="nf">show_output_species</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">graph_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">parse_output_species</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_output</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">(),</span>
+                                                                           <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_window</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">log</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">show_species</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas_view_2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">output_species_dict</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">print_errors</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">print_errors</span><span class="p">(</span><span class="n">graph_errors</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s1">&#39;Generate the output first!&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="UiControl.show_species_clicked"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.show_species_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">show_species_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_unlock</span><span class="p">()</span>
+        <span class="c1"># self.optimization_unlock()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_input_species</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.open_file"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.open_file">[docs]</a>    <span class="k">def</span> <span class="nf">open_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">file_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Select File&quot;</span><span class="p">,</span> <span class="s2">&quot;./res&quot;</span><span class="p">,</span>
+                                                  <span class="s2">&quot;All Files (*);;Text Files (*.txt)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_dir</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s2">&quot;Reading file: &quot;</span> <span class="o">+</span> <span class="n">file_dir</span><span class="p">)</span>
+            <span class="n">text</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">file_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">code_text</span><span class="o">.</span><span class="n">setPlainText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">error</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">show_species_clicked</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.reset_all"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.reset_all">[docs]</a>    <span class="k">def</span> <span class="nf">reset_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_model</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_view</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_view</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_output</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_species_no</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_widget</span><span class="o">.</span><span class="n">layout</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network_viewer</span><span class="o">.</span><span class="n">set_network</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_colors</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">reset_color</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_combo</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_combo</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="s2">&quot;Choose species&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.delete_layout"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.delete_layout">[docs]</a>    <span class="k">def</span> <span class="nf">delete_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">layout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">layout</span><span class="o">.</span><span class="n">count</span><span class="p">():</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">takeAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">widget</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">widget</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">widget</span><span class="o">.</span><span class="n">deleteLater</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">deleteLayout</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">layout</span><span class="p">())</span>
+            <span class="n">sip</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.save_file"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.save_file">[docs]</a>    <span class="k">def</span> <span class="nf">save_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text_input</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text_input</span><span class="o">.</span><span class="n">toPlainText</span><span class="p">()</span>
+        <span class="n">file_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;QFileDialog.getSaveFileName()&quot;</span><span class="p">,</span> <span class="s2">&quot;./res&quot;</span><span class="p">,</span>
+                                                   <span class="s2">&quot;All Files (*)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+            <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.save_img_file"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.save_img_file">[docs]</a>    <span class="k">def</span> <span class="nf">save_img_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">view</span><span class="p">):</span>
+        <span class="n">file_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;QFileDialog.getSaveFileName()&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+                                                   <span class="s2">&quot;SVG Files (*.svg)&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+            <span class="n">svg</span> <span class="o">=</span> <span class="n">QSvgGenerator</span><span class="p">()</span>
+            <span class="n">svg</span><span class="o">.</span><span class="n">setFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+            <span class="n">svg</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">sceneRect</span><span class="p">()</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">view</span><span class="o">.</span><span class="n">sceneRect</span><span class="p">()</span><span class="o">.</span><span class="n">height</span><span class="p">()))</span>
+            <span class="n">svg</span><span class="o">.</span><span class="n">setViewBox</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">sceneRect</span><span class="p">())</span>
+            <span class="n">painter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">svg</span><span class="p">)</span>
+            <span class="n">view</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">painter</span><span class="p">)</span>
+            <span class="n">painter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.save_svg_file"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.save_svg_file">[docs]</a>    <span class="k">def</span> <span class="nf">save_svg_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">file_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;QFileDialog.getSaveFileName()&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
+                                                   <span class="s2">&quot;SVG Files (*.svg&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">file_name</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s1">&#39;tmp/network.svg&#39;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_error</span><span class="p">(</span><span class="s1">&#39;Cannot save the network&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.print_errors"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.print_errors">[docs]</a>    <span class="k">def</span> <span class="nf">print_errors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">terminal_error_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.print_error"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.print_error">[docs]</a>    <span class="k">def</span> <span class="nf">print_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_error_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.print_log"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.print_log">[docs]</a>    <span class="k">def</span> <span class="nf">print_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal_output_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.print_logs"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.print_logs">[docs]</a>    <span class="k">def</span> <span class="nf">print_logs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">terminal_output_text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">log</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminal</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.print_output"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.print_output">[docs]</a>    <span class="k">def</span> <span class="nf">print_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_output</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.reset_view"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.reset_view">[docs]</a>    <span class="k">def</span> <span class="nf">reset_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas_view</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">canvas_view</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_final_species_render</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas_view_2</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">canvas_view_2</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_final_species_render</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="UiControl.reset_model"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.reset_model">[docs]</a>    <span class="k">def</span> <span class="nf">reset_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">reset_species</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.reset_current_model"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.reset_current_model">[docs]</a>    <span class="k">def</span> <span class="nf">reset_current_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">reset_species</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.network_species_clicked"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.network_species_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">network_species_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SpeciesWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">close_detached_windows</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_img_file</span><span class="p">))</span>
+        <span class="n">species_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">output_species_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_finished</span><span class="p">(</span><span class="n">species_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.network_reaction_clicked"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.network_reaction_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">network_reaction_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">reaction_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">black_edges_in</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">black_edges_out</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">black_reaction_rate</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">gray_reaction_rate</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">ReactionWindow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">close_detached_windows</span><span class="p">,</span> <span class="n">reaction_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_img_file</span><span class="p">))</span>
+
+        <span class="n">input_species_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">output_species_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">int_species_name</span> <span class="ow">in</span> <span class="n">black_edges_in</span><span class="p">:</span>
+            <span class="n">input_species_dict</span><span class="p">[</span><span class="n">int_species_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">output_species_dict</span><span class="p">[</span><span class="n">int_species_name</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">out_species_name</span> <span class="ow">in</span> <span class="n">black_edges_out</span><span class="p">:</span>
+            <span class="n">output_species_dict</span><span class="p">[</span><span class="n">out_species_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ui_model</span><span class="o">.</span><span class="n">output_species_dict</span><span class="p">[</span><span class="n">out_species_name</span><span class="p">]</span>
+
+        <span class="n">scene</span> <span class="o">=</span> <span class="n">QGraphicsScene</span><span class="p">()</span>
+        <span class="n">arrows</span> <span class="o">=</span> <span class="n">ReactionArrowGraphicsItem</span><span class="p">(</span><span class="n">reaction_name</span><span class="p">,</span> <span class="n">black_reaction_rate</span><span class="p">,</span> <span class="n">gray_reaction_rate</span><span class="p">)</span>
+        <span class="n">scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">arrows</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">view_reaction</span><span class="o">.</span><span class="n">setScene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_rendering</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_finished</span><span class="p">(</span><span class="n">input_species_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">view_input</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_finished</span><span class="p">(</span><span class="n">output_species_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">species_detached_windows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">view_output</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.optimization_finished"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.optimization_finished">[docs]</a>    <span class="k">def</span> <span class="nf">optimization_finished</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species_dict</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_species</span><span class="p">(</span><span class="n">view</span><span class="p">,</span> <span class="n">species_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_log</span><span class="p">(</span><span class="s2">&quot;Optimization finished&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.change_optimization_button"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.change_optimization_button">[docs]</a>    <span class="k">def</span> <span class="nf">change_optimization_button</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">flag</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">for</span> <span class="n">flag_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizing</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">flag_value</span><span class="p">:</span>
+                <span class="n">flag</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_button</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.stop"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">change_optimization_button</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_unlock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">simulate_unlock</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.set_slider_value"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.set_slider_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_slider_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slider_value_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; iteration&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slider_value_label</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; iterations&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UiControl.set_slider_value2"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.set_slider_value2">[docs]</a>    <span class="k">def</span> <span class="nf">set_slider_value2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">INITIAL_ITER_NO</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider_value_label2</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UiControl.change_layout"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.change_layout">[docs]</a>    <span class="k">def</span> <span class="nf">change_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">STRAIGHT_LINES</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="UiControl.closeEvent"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.closeEvent">[docs]</a>    <span class="k">def</span> <span class="nf">closeEvent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a0</span><span class="p">:</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QCloseEvent</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">flag_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizing</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizing</span><span class="p">[</span><span class="n">flag_id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="s1">&#39;tmp&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close_detached_windows</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span>
+        <span class="n">a0</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="UiControl.reset_species_combo"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.UiControl.reset_species_combo">[docs]</a>    <span class="k">def</span> <span class="nf">reset_species_combo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_combo</span><span class="o">.</span><span class="n">setCurrentIndex</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="QGraphicsDoubleLineItem"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.QGraphicsDoubleLineItem">[docs]</a><span class="k">class</span> <span class="nc">QGraphicsDoubleLineItem</span><span class="p">(</span><span class="n">QGraphicsItem</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">color1</span><span class="p">,</span> <span class="n">color2</span><span class="p">):</span>
+        <span class="n">QGraphicsItem</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color1</span> <span class="o">=</span> <span class="n">color1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color2</span> <span class="o">=</span> <span class="n">color2</span>
+
+    <span class="c1"># implementation of QGraphicsItem virtual methods</span>
+
+<div class="viewcode-block" id="QGraphicsDoubleLineItem.boundingRect"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.QGraphicsDoubleLineItem.boundingRect">[docs]</a>    <span class="k">def</span> <span class="nf">boundingRect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">up</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">QRectF</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">up</span><span class="p">,</span> <span class="n">right</span> <span class="o">-</span> <span class="n">left</span><span class="p">,</span> <span class="n">up</span> <span class="o">-</span> <span class="n">down</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QGraphicsDoubleLineItem.paint"><a class="viewcode-back" href="../../../src.interface.html#src.interface.ui_control.QGraphicsDoubleLineItem.paint">[docs]</a>    <span class="k">def</span> <span class="nf">paint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="n">pen</span> <span class="o">=</span> <span class="n">QPen</span><span class="p">()</span>
+        <span class="n">pen</span><span class="o">.</span><span class="n">setWidth</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">pen</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color1</span><span class="p">))</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">QPainter</span><span class="o">.</span><span class="n">Antialiasing</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mid</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="n">pen</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color2</span><span class="p">))</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">setPen</span><span class="p">(</span><span class="n">pen</span><span class="p">)</span>
+        <span class="n">painter</span><span class="o">.</span><span class="n">drawLine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Malgorzata Nowicka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
