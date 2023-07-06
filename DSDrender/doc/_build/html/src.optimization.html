@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.optimization package &mdash; DSDui  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> DSDui
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mainmodules.html">Main modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DSDui</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>src.optimization package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.optimization.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="src-optimization-package">
+<h1>src.optimization package<a class="headerlink" href="#src-optimization-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-src.optimization.energy_function">
+<span id="src-optimization-energy-function-module"></span><h2>src.optimization.energy_function module<a class="headerlink" href="#module-src.optimization.energy_function" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.optimization.energy_function.E">
+<code class="sig-prename descclassname">src.optimization.energy_function.</code><code class="sig-name descname">E</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">graph_domain_pairs</span></em>, <em class="sig-param"><span class="n">graph_loops</span></em>, <em class="sig-param"><span class="n">length_factor</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/energy_function.html#E"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.energy_function.E" title="Permalink to this definition">¶</a></dt>
+<dd><p>Energy function for a single species. Computes the following components:  deviation from the desired distance between the ends of each loop, deviation from the desired length of each domain, deviation from the correct placements of domains withing each pair.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Tuple with G (graph) and GA (graph attributes)</p></li>
+<li><p><strong>graph_domain_pairs</strong> – Dictionary with the pairs of domains and their constituent nodes</p></li>
+<li><p><strong>graph_loops</strong> – Dictionary with the endings of the loops in the species and their constituent nodes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Sum of all the components and tuple with the constituent components (for plotting purposes)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.optimization.optimization_error">
+<span id="src-optimization-optimization-error-module"></span><h2>src.optimization.optimization_error module<a class="headerlink" href="#module-src.optimization.optimization_error" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt id="src.optimization.optimization_error.OptimizationError">
+<em class="property">exception </em><code class="sig-prename descclassname">src.optimization.optimization_error.</code><code class="sig-name descname">OptimizationError</code><a class="reference internal" href="_modules/src/optimization/optimization_error.html#OptimizationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.optimization_error.OptimizationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.optimization.simulated_annealing">
+<span id="src-optimization-simulated-annealing-module"></span><h2>src.optimization.simulated_annealing module<a class="headerlink" href="#module-src.optimization.simulated_annealing" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.decrease_temperature">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">decrease_temperature</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">cool</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#decrease_temperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.decrease_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cooling schedule of the optimization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – Current temperature</p></li>
+<li><p><strong>cool</strong> – Cooling factor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New temperature</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.get_bond_target_candidate">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">get_bond_target_candidate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node1</span></em>, <em class="sig-param"><span class="n">node2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#get_bond_target_candidate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.get_bond_target_candidate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the candidate placement of the bond target for the domain which ends are denoted by the parameters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>node1</strong> – First end of the considered domain</p></li>
+<li><p><strong>node2</strong> – Second end of the considered domain</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.get_pair_convexity">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">get_pair_convexity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">first_candidate</span></em>, <em class="sig-param"><span class="n">second_candidate</span></em>, <em class="sig-param"><span class="n">first_node1</span></em>, <em class="sig-param"><span class="n">first_node2</span></em>, <em class="sig-param"><span class="n">second_node1</span></em>, <em class="sig-param"><span class="n">second_node2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#get_pair_convexity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.get_pair_convexity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check how many cosines of the angles between vector from the node to the paired node and the node to the candidate place for the paired node are positive i.e. if the shape between the pairs is a valid quadrilateral (where only one of the angles can be greater than 180 degrees).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>first_candidate</strong> – Candidate placement for the bond target for the first domain in the pair</p></li>
+<li><p><strong>second_candidate</strong> – Candidate placement for the bond target for the second domain in the pair</p></li>
+<li><p><strong>first_node1</strong> – Node denoting the beginning of the first domain in the pair</p></li>
+<li><p><strong>first_node2</strong> – Node denoting the end of the first domain in the pair</p></li>
+<li><p><strong>second_node1</strong> – Node denoting the beginning of the second domain in the pair</p></li>
+<li><p><strong>second_node2</strong> – Node denoting the end of the first second in the pair</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.get_side_convexity">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">get_side_convexity</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">candidate</span></em>, <em class="sig-param"><span class="n">first_node1</span></em>, <em class="sig-param"><span class="n">first_node2</span></em>, <em class="sig-param"><span class="n">second_node1</span></em>, <em class="sig-param"><span class="n">second_node2</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#get_side_convexity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.get_side_convexity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the sign of the cosine of the angle between vector from the node to the paired node and the node to the candidate place for the paired node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>candidate</strong> – Candidate placement for the bond target for the domain in the pair</p></li>
+<li><p><strong>first_node1</strong> – Node denoting the beginning of the first domain in the pair</p></li>
+<li><p><strong>first_node2</strong> – Node denoting the end of the first domain in the pair</p></li>
+<li><p><strong>second_node1</strong> – Node denoting the beginning of the second domain in the pair</p></li>
+<li><p><strong>second_node2</strong> – Node denoting the end of the first second in the pair</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.move">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">move</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">increment</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#move"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.move" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the state change in the simulated annealing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Species object to be changed</p></li>
+<li><p><strong>increment</strong> – Upper bound on the movement of species’ hinges (in pixels)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New Species object after the change</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.optimize">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">optimize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">G</span></em>, <em class="sig-param"><span class="n">GA</span></em>, <em class="sig-param"><span class="n">graph_domain_pairs</span></em>, <em class="sig-param"><span class="n">graph_loops</span></em>, <em class="sig-param"><span class="n">signals</span></em>, <em class="sig-param"><span class="n">species_no</span></em>, <em class="sig-param"><span class="n">stop</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#optimize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.optimize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs the main loop of the simulated annealing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> – Graph representation of the species, holds info on the embedding</p></li>
+<li><p><strong>GA</strong> – Graph attributes of G, holds info on the placements of the nodes</p></li>
+<li><p><strong>graph_domain_pairs</strong> – Dictionary with the pairs of domains and their constituent nodes</p></li>
+<li><p><strong>graph_loops</strong> – Dictionary with the endings of the loops in the species and their constituent nodes</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.optimize_one_iteration">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">optimize_one_iteration</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">energy</span></em>, <em class="sig-param"><span class="n">increment</span></em>, <em class="sig-param"><span class="n">T</span></em>, <em class="sig-param"><span class="n">best_state</span></em>, <em class="sig-param"><span class="n">best_energy</span></em>, <em class="sig-param"><span class="n">iterations_number</span></em>, <em class="sig-param"><span class="n">graph_domain_pairs</span></em>, <em class="sig-param"><span class="n">graph_loops</span></em>, <em class="sig-param"><span class="n">energy_history</span></em>, <em class="sig-param"><span class="n">length_factor</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#optimize_one_iteration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.optimize_one_iteration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs state change in the given temperature in simulated annealing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Species object to be optimized</p></li>
+<li><p><strong>energy</strong> – Value of the initial state’s energy function E</p></li>
+<li><p><strong>increment</strong> – Upper bound on the movement of species’ hinges (in pixels)</p></li>
+<li><p><strong>T</strong> – Current temperature value</p></li>
+<li><p><strong>best_state</strong> – Reference value for the best state after the optimization (initially equal to state)</p></li>
+<li><p><strong>best_energy</strong> – Reference value for the energy of the best state  after the optimization (initially equal to energy)</p></li>
+<li><p><strong>iterations_number</strong> – Number of state changes to perform (moves)</p></li>
+<li><p><strong>graph_domain_pairs</strong> – Dictionary with the pairs of domains and their constituent nodes</p></li>
+<li><p><strong>graph_loops</strong> – Dictionary with the endings of the loops in the species and their constituent nodes</p></li>
+<li><p><strong>energy_history</strong> – Array holding the history of all the energy components (for plotting purposes)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.set_bond_targets">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">set_bond_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">GA</span></em>, <em class="sig-param"><span class="n">graph_domain_pairs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#set_bond_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.set_bond_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the designated placement of the pairs in relation to each other, i.e. the beginning of one domain is at
+DOMAIN/sqrt(2) orthogonal distance from the end of the second domain in a pair</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>GA</strong> – Graph attributes holding info on the nodes. The resulting placements are wrote into nodes’ labels in</p>
+</dd>
+</dl>
+<p>the format !bond_id first_place second_place
+:param graph_domain_pairs: Dictionary with all the pair in the species</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.unmove">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">unmove</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">node</span></em>, <em class="sig-param"><span class="n">dx</span></em>, <em class="sig-param"><span class="n">dy</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#unmove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.unmove" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undoes the state change in the simulated annealing</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> – Species object to be changed</p></li>
+<li><p><strong>node</strong> – Node to be moved back</p></li>
+<li><p><strong>dx</strong> – X increment</p></li>
+<li><p><strong>dy</strong> – Y increment</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>New Species object after the change</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="src.optimization.simulated_annealing.write_bond_targets">
+<code class="sig-prename descclassname">src.optimization.simulated_annealing.</code><code class="sig-name descname">write_bond_targets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">GA</span></em>, <em class="sig-param"><span class="n">bond</span></em>, <em class="sig-param"><span class="n">pair</span></em>, <em class="sig-param"><span class="n">perp</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/optimization/simulated_annealing.html#write_bond_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#src.optimization.simulated_annealing.write_bond_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the coordinates of the bond targets to the nodes’ labels which are determined by the perpendicular vector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>GA</strong> – Graph attributes holding the nodes’ labels</p></li>
+<li><p><strong>bond</strong> – Bond id for the pair</p></li>
+<li><p><strong>pair</strong> – Domain for which the bonds are determined</p></li>
+<li><p><strong>perp</strong> – Perpendicular vector to the pair domain</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-src.optimization">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.optimization" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Malgorzata Nowicka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
