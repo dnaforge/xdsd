@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.optimization.energy_function &mdash; DSDrender  documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> DSDrender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mainmodules.html">Main modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DSDrender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.optimization.energy_function</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.optimization.energy_function</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">exp</span>
+
+<span class="kn">from</span> <span class="nn">src.utils.config</span> <span class="kn">import</span> <span class="n">euclidean_dist</span><span class="p">,</span> <span class="n">DOMAIN_LEN</span><span class="p">,</span> <span class="n">TOEHOLD_LEN</span>
+
+
+<div class="viewcode-block" id="E"><a class="viewcode-back" href="../../../src.optimization.html#src.optimization.energy_function.E">[docs]</a><span class="k">def</span> <span class="nf">E</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">graph_domain_pairs</span><span class="p">,</span> <span class="n">graph_loops</span><span class="p">,</span> <span class="n">length_factor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Energy function for a single species. Computes the following components:  deviation from the desired distance between the ends of each loop, deviation from the desired length of each domain, deviation from the correct placements of domains withing each pair.</span>
+
+<span class="sd">    :param state: Tuple with G (graph) and GA (graph attributes)</span>
+<span class="sd">    :param graph_domain_pairs: Dictionary with the pairs of domains and their constituent nodes</span>
+<span class="sd">    :param graph_loops: Dictionary with the endings of the loops in the species and their constituent nodes</span>
+<span class="sd">    :return: Sum of all the components and tuple with the constituent components (for plotting purposes)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">G</span><span class="p">,</span> <span class="n">GA</span> <span class="o">=</span> <span class="n">state</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">loops</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">domain_lengths</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># loop gaps</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">loop</span> <span class="ow">in</span> <span class="n">graph_loops</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">first_node</span> <span class="o">=</span> <span class="p">[</span><span class="n">GA</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">GA</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">second_node</span> <span class="o">=</span> <span class="p">[</span><span class="n">GA</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">GA</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">loop</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">first_node</span><span class="p">,</span> <span class="n">second_node</span><span class="p">)</span>
+
+        <span class="n">diff</span> <span class="o">+=</span> <span class="n">length_factor</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">DOMAIN_LEN</span> <span class="o">-</span> <span class="n">length</span><span class="p">)</span>
+        <span class="n">loops</span> <span class="o">+=</span> <span class="n">length_factor</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">DOMAIN_LEN</span> <span class="o">-</span> <span class="n">length</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">bond</span><span class="p">,</span> <span class="n">nodes</span> <span class="ow">in</span> <span class="n">graph_domain_pairs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">first_pair</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">second_pair</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">first_node1</span> <span class="o">=</span> <span class="p">[</span><span class="n">GA</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">GA</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="n">first_node2</span> <span class="o">=</span> <span class="p">[</span><span class="n">GA</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">GA</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+
+        <span class="n">second_node2</span> <span class="o">=</span> <span class="p">[</span><span class="n">GA</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">second_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">GA</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">second_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+        <span class="n">second_node1</span> <span class="o">=</span> <span class="p">[</span><span class="n">GA</span><span class="o">.</span><span class="n">x</span><span class="p">(</span><span class="n">second_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">GA</span><span class="o">.</span><span class="n">y</span><span class="p">(</span><span class="n">second_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+        <span class="c1"># domain lengths</span>
+        <span class="n">length1</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">first_node1</span><span class="p">,</span> <span class="n">first_node2</span><span class="p">)</span>
+        <span class="n">length2</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">second_node1</span><span class="p">,</span> <span class="n">second_node2</span><span class="p">)</span>
+        <span class="c1"># diff += length_factor * (abs(DOMAIN_LEN - length1) + abs(DOMAIN_LEN - length2))</span>
+
+        <span class="k">if</span> <span class="n">bond</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;^&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">+=</span> <span class="n">length_factor</span> <span class="o">*</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">TOEHOLD_LEN</span> <span class="o">-</span> <span class="n">length1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">TOEHOLD_LEN</span> <span class="o">-</span> <span class="n">length2</span><span class="p">))</span>
+            <span class="n">domain_lengths</span> <span class="o">+=</span> <span class="n">length_factor</span> <span class="o">*</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">TOEHOLD_LEN</span> <span class="o">-</span> <span class="n">length1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">TOEHOLD_LEN</span> <span class="o">-</span> <span class="n">length2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diff</span> <span class="o">+=</span> <span class="n">length_factor</span> <span class="o">*</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">DOMAIN_LEN</span> <span class="o">-</span> <span class="n">length1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">DOMAIN_LEN</span> <span class="o">-</span> <span class="n">length2</span><span class="p">))</span>
+            <span class="n">domain_lengths</span> <span class="o">+=</span> <span class="n">length_factor</span> <span class="o">*</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">DOMAIN_LEN</span> <span class="o">-</span> <span class="n">length1</span><span class="p">)</span> <span class="o">+</span> <span class="nb">abs</span><span class="p">(</span><span class="n">DOMAIN_LEN</span> <span class="o">-</span> <span class="n">length2</span><span class="p">))</span>
+
+        <span class="c1"># beginning and end of pair</span>
+        <span class="n">first_labels</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">GA</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">second_labels</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">GA</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">second_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_labels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">second_labels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">first_labels</span> <span class="o">=</span> <span class="n">first_labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">second_labels</span> <span class="o">=</span> <span class="n">second_labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="c1"># search for the right connection</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_labels</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">second_labels</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">first_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">second_labels</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                        <span class="n">first_dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">first_labels</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="n">first_dy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">first_labels</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+
+                        <span class="n">second_dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">second_labels</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="n">second_dy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">second_labels</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+
+                        <span class="n">dist1</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">second_node2</span><span class="p">,</span> <span class="p">[</span><span class="n">first_node1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">first_dx</span><span class="p">,</span> <span class="n">first_node1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">first_dy</span><span class="p">])</span>
+                        <span class="n">dist2</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">first_node1</span><span class="p">,</span> <span class="p">[</span><span class="n">second_node2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">second_dx</span><span class="p">,</span> <span class="n">second_node2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">second_dy</span><span class="p">])</span>
+
+                        <span class="n">pairs</span> <span class="o">+=</span> <span class="n">dist1</span>
+                        <span class="n">pairs</span> <span class="o">+=</span> <span class="n">dist2</span>
+
+                        <span class="c1"># diff += 2 * DOMAIN_LEN * exp(-dist1 / DOMAIN_LEN) + 1</span>
+                        <span class="c1"># diff += 2 * DOMAIN_LEN * exp(-dist2 / DOMAIN_LEN) + 1</span>
+
+                        <span class="n">diff</span> <span class="o">+=</span> <span class="n">dist1</span>
+                        <span class="n">diff</span> <span class="o">+=</span> <span class="n">dist2</span>
+
+                        <span class="k">break</span>
+
+        <span class="c1"># end and beginning of pair</span>
+        <span class="n">first_labels</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">GA</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">second_labels</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">GA</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">second_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_labels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">second_labels</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="n">first_labels</span> <span class="o">=</span> <span class="n">first_labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="n">second_labels</span> <span class="o">=</span> <span class="n">second_labels</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_labels</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">second_labels</span><span class="p">),</span> <span class="mi">3</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">first_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">second_labels</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                        <span class="n">first_dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">first_labels</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="n">first_dy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">first_labels</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+
+                        <span class="n">second_dx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">second_labels</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="n">second_dy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">second_labels</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">])</span>
+
+                        <span class="n">dist1</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">second_node1</span><span class="p">,</span> <span class="p">[</span><span class="n">first_node2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">first_dx</span><span class="p">,</span> <span class="n">first_node2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">first_dy</span><span class="p">])</span>
+                        <span class="n">dist2</span> <span class="o">=</span> <span class="n">euclidean_dist</span><span class="p">(</span><span class="n">first_node2</span><span class="p">,</span> <span class="p">[</span><span class="n">second_node1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">second_dx</span><span class="p">,</span> <span class="n">second_node1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">second_dy</span><span class="p">])</span>
+
+                        <span class="n">pairs</span> <span class="o">+=</span> <span class="n">dist1</span>
+                        <span class="n">pairs</span> <span class="o">+=</span> <span class="n">dist2</span>
+
+                        <span class="c1"># diff += 2 * DOMAIN_LEN * exp(-dist1/DOMAIN_LEN)+1</span>
+                        <span class="c1"># diff += 2 * DOMAIN_LEN * exp(-dist2 / DOMAIN_LEN) + 1</span>
+
+                        <span class="n">diff</span> <span class="o">+=</span> <span class="n">dist1</span>
+                        <span class="n">diff</span> <span class="o">+=</span> <span class="n">dist2</span>
+
+                        <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">diff</span><span class="p">,</span> <span class="p">(</span><span class="n">loops</span><span class="p">,</span> <span class="n">domain_lengths</span><span class="p">,</span> <span class="n">pairs</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Malgorzata Nowicka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

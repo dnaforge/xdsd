@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.elements.graph &mdash; DSDrender  documentation</title><link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> DSDrender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../mainmodules.html">Main modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">DSDrender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>src.elements.graph</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for src.elements.graph</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="kn">from</span> <span class="nn">src.elements.domain</span> <span class="kn">import</span> <span class="n">Domain</span>
+<span class="kn">from</span> <span class="nn">src.elements.graph_exception</span> <span class="kn">import</span> <span class="n">GraphException</span>
+<span class="kn">from</span> <span class="nn">src.elements.loop</span> <span class="kn">import</span> <span class="n">Loop</span>
+<span class="kn">from</span> <span class="nn">src.optimization.simulated_annealing</span> <span class="kn">import</span> <span class="n">optimize</span>
+<span class="kn">import</span> <span class="nn">src.utils.config</span>
+
+<span class="c1"># if len(sys.argv) &gt; 1 and &quot;OGDF_INSTALL_DIR&quot; not in os.environ:</span>
+<span class="c1">#     os.environ[&quot;OGDF_INSTALL_DIR&quot;] = sys.argv[1]</span>
+<span class="c1"># elif &quot;OGDF_INSTALL_DIR&quot; not in os.environ:</span>
+<span class="c1">#     os.environ[&quot;OGDF_INSTALL_DIR&quot;] = &quot;./ogdf/cmake-build-release&quot;</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OGDF_INSTALL_DIR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;../ogdf/cmake-build-release&quot;</span>
+
+<span class="kn">from</span> <span class="nn">ogdf_python</span> <span class="kn">import</span> <span class="n">ogdf</span><span class="p">,</span> <span class="n">cppinclude</span>
+
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/planarlayout/PlanarDrawLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/planarity/PlanarizationLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/misclayout/BertaultLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/fileformats/GraphIO.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/planarlayout/PlanarStraightLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/upward/UpwardPlanarizationLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/energybased/TutteLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/orthogonal/OrthoLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/planarlayout/SchnyderLayout.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/basic/extended_graph_alg.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/basic/simple_graph_alg.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/planarity/EmbedderMinDepthMaxFace.h&quot;</span><span class="p">)</span>
+<span class="n">cppinclude</span><span class="p">(</span><span class="s2">&quot;ogdf/planarity/EmbedderMaxFace.h&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Graph"><a class="viewcode-back" href="../../../src.elements.html#src.elements.graph.Graph">[docs]</a><span class="k">class</span> <span class="nc">Graph</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a graph representation of a species. Every domain is denoted by two vertices (in the ebginning and the end of the domain) denoting the 3&#39; and 5&#39; end. The edges represent both covalent and hydrogen bonds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">species</span><span class="p">,</span> <span class="n">signals</span><span class="p">,</span> <span class="n">species_no</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>
+        <span class="c1"># key is domain value is a list of points</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ga</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">signals</span> <span class="o">=</span> <span class="n">signals</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species_no</span> <span class="o">=</span> <span class="n">species_no</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop</span> <span class="o">=</span> <span class="n">stop</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s2">&quot;plots&quot;</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s2">&quot;plots&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">build_graph_from_species</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Graph.build_graph_from_species"><a class="viewcode-back" href="../../../src.elements.html#src.elements.graph.Graph.build_graph_from_species">[docs]</a>    <span class="k">def</span> <span class="nf">build_graph_from_species</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a graph representation of self.species, checks if the resulting graph is planar. If it is, a planar layout is chosen, an embedding with minimum depth and maximum face is fixed, the lengths of the edges are adjusted and the planar graph is drawn. In the case that graph is not planar, or if the prevoius algorithm failed to draw  the graph without crossings, an orthogonal layout is chosen and the process repeated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="c1"># label the edges</span>
+        <span class="c1"># hydrogen bonds: !bond_name</span>
+        <span class="c1"># covalent bonds: $bond_name$element_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ga</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">GraphAttributes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">GraphAttributes</span><span class="o">.</span><span class="n">all</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># same as domain pairs but with lists of graph nodes instead of lists of domain objects</span>
+        <span class="n">graph_domain_pairs</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+        <span class="c1"># holds nodes of the loops</span>
+        <span class="n">graph_loops</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># create a node for each domain and connect it with the neighbors in the same strand</span>
+        <span class="k">for</span> <span class="n">strand</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">get_strands</span><span class="p">():</span>
+            <span class="n">domains</span> <span class="o">=</span> <span class="n">strand</span><span class="o">.</span><span class="n">get_domains</span><span class="p">()</span>
+            <span class="n">prev_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">newNode</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">domain</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">domains</span><span class="p">):</span>
+                <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">newNode</span><span class="p">()</span>
+                <span class="c1"># add domain bonding to the graph_domain_pairs</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Domain</span> <span class="ow">and</span> <span class="n">domain</span><span class="o">.</span><span class="n">bond</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;-1&quot;</span><span class="p">:</span>
+                    <span class="n">graph_domain_pairs</span><span class="p">[</span><span class="n">domain</span><span class="o">.</span><span class="n">bond</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">prev_node</span><span class="p">,</span> <span class="n">node</span><span class="p">))</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Loop</span><span class="p">:</span>
+                    <span class="n">graph_loops</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">prev_node</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+                <span class="c1"># connect with neighbors</span>
+                <span class="n">edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">newEdge</span><span class="p">(</span><span class="n">prev_node</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">bond</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;$&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">domain</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
+                <span class="n">prev_node</span> <span class="o">=</span> <span class="n">node</span>
+
+        <span class="c1"># connect the bounded domains</span>
+        <span class="k">for</span> <span class="n">bond</span><span class="p">,</span> <span class="n">nodes</span> <span class="ow">in</span> <span class="n">graph_domain_pairs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">first_pair</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">second_pair</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">searchEdge</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">second_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">edge</span><span class="p">:</span>
+                <span class="n">edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">newEdge</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">second_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;!&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;!&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+            <span class="n">edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">searchEdge</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">second_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">edge</span><span class="p">:</span>
+                <span class="n">edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">newEdge</span><span class="p">(</span><span class="n">first_pair</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">second_pair</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;!&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="o">.</span><span class="n">label</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span> <span class="o">+=</span> <span class="s1">&#39;!&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">bond</span><span class="p">)</span>
+
+        <span class="c1"># PlanarDrawLayout accepts only planar graphs, crashes in other case</span>
+        <span class="c1"># PlanarizationLayout accepts non-planar graphs, but works with the orthogonal layout, so crossings possible</span>
+        <span class="c1"># check if planar and then embed</span>
+        <span class="n">planar</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">isPlanar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">planar</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="p">(</span><span class="n">GraphException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; is not planar&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">src</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">STRAIGHT_LINES</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="p">(</span><span class="n">GraphException</span><span class="p">(</span><span class="s2">&quot;Non-default layout chosen&quot;</span><span class="p">))</span>
+
+            <span class="c1"># try to minimize the topological depth and maximize the external face</span>
+            <span class="n">pl</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">PlanarDrawLayout</span><span class="p">()</span>
+            <span class="n">emb</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">EmbedderMinDepthMaxFace</span><span class="p">()</span>
+            <span class="n">emb</span><span class="o">.</span><span class="n">__python_owns__</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">setEmbedder</span><span class="p">(</span><span class="n">emb</span><span class="p">)</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">)</span>
+
+            <span class="c1"># ogdf.GraphIO.write(self.g, &quot;example_oh.gml&quot;)</span>
+            <span class="c1"># ogdf.GraphIO.write(self.ga, &quot;example.svg&quot;, ogdf.GraphIO.drawSVG)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">numberOfNodes</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">is_overhang</span><span class="p">():</span>
+                <span class="n">bl</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">BertaultLayout</span><span class="p">()</span>
+                <span class="n">bl</span><span class="o">.</span><span class="n">reqlength</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">DOMAIN_LEN</span> <span class="o">/</span> <span class="mf">2.5</span><span class="p">)</span>
+                <span class="n">bl</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">)</span>
+                <span class="n">cross_after</span> <span class="o">=</span> <span class="n">bl</span><span class="o">.</span><span class="n">edgeCrossings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">cross_after</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">GraphException</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cross_after</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; edge(s) crossing in &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">energy_history</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">,</span> <span class="n">graph_domain_pairs</span><span class="p">,</span> <span class="n">graph_loops</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">species_no</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+            <span class="c1">#     self.save_energy_plot(self.species.name, energy_history)</span>
+        <span class="k">except</span> <span class="n">GraphException</span> <span class="k">as</span> <span class="n">ge</span><span class="p">:</span>
+            <span class="c1"># try to only maximize the external face</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ge</span><span class="p">)</span>
+            <span class="n">pl</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">PlanarizationLayout</span><span class="p">()</span>
+            <span class="n">orth</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">OrthoLayout</span><span class="p">()</span>
+            <span class="n">orth</span><span class="o">.</span><span class="n">bendBound</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">orth</span><span class="o">.</span><span class="n">__python_owns__</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">setPlanarLayouter</span><span class="p">(</span><span class="n">orth</span><span class="p">)</span>
+            <span class="n">emb</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">EmbedderMinDepthMaxFace</span><span class="p">()</span>
+            <span class="n">emb</span><span class="o">.</span><span class="n">__python_owns__</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">setEmbedder</span><span class="p">(</span><span class="n">emb</span><span class="p">)</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">numberOfNodes</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">is_overhang</span><span class="p">():</span>
+                <span class="n">bl</span> <span class="o">=</span> <span class="n">ogdf</span><span class="o">.</span><span class="n">BertaultLayout</span><span class="p">()</span>
+                <span class="n">bl</span><span class="o">.</span><span class="n">reqlength</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">DOMAIN_LEN</span> <span class="o">/</span> <span class="mf">2.5</span><span class="p">)</span>
+                <span class="n">bl</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">)</span>
+                <span class="n">cross_after</span> <span class="o">=</span> <span class="n">bl</span><span class="o">.</span><span class="n">edgeCrossings</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GraphException</span><span class="p">(</span>
+                    <span class="s2">&quot;Retry the embedding. &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cross_after</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; edge(s) crossing in &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="n">energy_history</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ga</span><span class="p">,</span> <span class="n">graph_domain_pairs</span><span class="p">,</span> <span class="n">graph_loops</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">species_no</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span></div>
+                <span class="c1"># self.save_energy_plot(self.species.name, energy_history)</span>
+
+<div class="viewcode-block" id="Graph.save_energy_plot"><a class="viewcode-back" href="../../../src.elements.html#src.elements.graph.Graph.save_energy_plot">[docs]</a>    <span class="k">def</span> <span class="nf">save_energy_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">energy_history</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plots the simulated annealing energy optimisation (decomposed into components, see: definition of E) and saves it to the /plots folder</span>
+
+<span class="sd">        :param name: Name of the species</span>
+<span class="sd">        :param energy_history: Array holding the history of all the energy components (for plotting purposes)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">margins</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;iterations&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;energy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s2">&quot;log&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_history</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;total&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_history</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;loops&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_history</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;domains&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_history</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;pairs&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s2">&quot;lower left&quot;</span><span class="p">,</span> <span class="n">borderaxespad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;./plots/energy_function_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">pad_inches</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Malgorzata Nowicka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

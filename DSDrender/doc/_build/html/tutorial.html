@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorial &mdash; DSDrender  documentation</title><link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Main modules" href="mainmodules.html" />
+    <link rel="prev" title="Welcome to DSDrender’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> DSDrender
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisities">Prerequisities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build">Build</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#run-program">Run program</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#input">Input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#simulation">Simulation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output">Output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="mainmodules.html">Main modules</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DSDrender</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Tutorial</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="prerequisities">
+<h2>Prerequisities<a class="headerlink" href="#prerequisities" title="Permalink to this headline">¶</a></h2>
+<p>1. To create the Anaconda environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">environment</span><span class="o">.</span><span class="n">yml</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">DSDrender</span>
+<span class="n">dot</span> <span class="o">-</span><span class="n">c</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>To install OGDF library follow the <a class="reference external" href="https://github.com/ogdf/ogdf/blob/master/doc/build.md">OGDF installation guide</a> or instructions below:</p></li>
+</ol>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p>CMake 3.1+</p></li>
+<li><p>C++11 compliant compiler</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>gcc 4.9.2+</p></li>
+<li><p>clang 3.5+</p></li>
+<li><p>Microsoft Visual C++ 2015+</p></li>
+</ul>
+</div></blockquote>
+</li>
+<li><p>GNU Make (in most cases)</p></li>
+</ul>
+</div>
+<div class="section" id="build">
+<h3>Build<a class="headerlink" href="#build" title="Permalink to this headline">¶</a></h3>
+<p>Download the latest release of <a class="reference external" href="https://github.com/ogdf/ogdf/">OGDF library</a>, change the name of the folder to <cite>ogdf</cite> and put the folder in <cite>src</cite>.</p>
+<p>For Unix systems follow the commands below.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">build</span><span class="o">.</span><span class="n">sh</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">ogdf</span>
+<span class="n">cmake</span> <span class="o">--</span><span class="n">build</span> <span class="o">./</span><span class="n">cmake</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">release</span> <span class="o">--</span><span class="n">target</span> <span class="n">OGDF</span> <span class="o">--</span> <span class="o">-</span><span class="n">j</span> <span class="mi">3</span>
+<span class="n">rm</span> <span class="o">-</span><span class="n">R</span> <span class="o">./</span><span class="n">cmake</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">lib</span> <span class="o">&amp;&amp;</span> <span class="n">echo</span> <span class="s2">&quot;Removed existing lib directory&quot;</span>
+<span class="n">mkdir</span> <span class="o">./</span><span class="n">cmake</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">lib</span> <span class="o">&amp;&amp;</span> <span class="n">cd</span> <span class="o">./</span><span class="n">cmake</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">release</span><span class="o">/</span><span class="n">lib</span> <span class="o">&amp;&amp;</span> <span class="n">echo</span> <span class="s2">&quot;Created new lib directory&quot;</span>
+<span class="n">ar</span> <span class="o">-</span><span class="n">x</span> <span class="o">../</span><span class="n">libOGDF</span><span class="o">.</span><span class="n">a</span>
+<span class="n">ar</span> <span class="o">-</span><span class="n">x</span> <span class="o">../</span><span class="n">libCOIN</span><span class="o">.</span><span class="n">a</span> <span class="o">&amp;&amp;</span> <span class="n">echo</span> <span class="s2">&quot;Unpacked the static libraries libCOIN.a and libOGDF.a&quot;</span>
+<span class="n">g</span><span class="o">++</span> <span class="o">-</span><span class="n">shared</span> <span class="o">*.</span><span class="n">o</span> <span class="o">-</span><span class="n">o</span> <span class="n">libOGDF</span><span class="o">.</span><span class="n">so</span> <span class="o">&amp;&amp;</span> <span class="n">echo</span> <span class="s2">&quot;Created a shared library libOGDF.so&quot;</span>
+</pre></div>
+</div>
+<p>Alternatively, you can use an IDE of your choice for building the project in
+the Release mode. Then follow the commands above from <cite>mkdir ./lib &amp;&amp; cd ./lib &amp;&amp; echo “Created new lib directory”</cite> line or copy your compiled library files (.so in the case of Unix systems, .dll and .lib in Windows) to the folder <cite>./ogdf/cmake-build-release/lib</cite> and synch the <cite>include</cite> directories in the <cite>./ogdf/cmake-build-release</cite> folder and <cite>./ogdf</cite> folder.</p>
+</div>
+</div>
+<div class="section" id="run-program">
+<h2>Run program<a class="headerlink" href="#run-program" title="Permalink to this headline">¶</a></h2>
+<p>If you followed the build guide for OGDF, run the program without arguments.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>In the case your compiled library files are stored elsewhere, run the program with the path that points to your compiled library files.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span> <span class="n">PATH_TO_COMPILED_LIBRARY_FILES</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Upon running the program a standalone application appears:</p>
+<div class="figure align-center" id="id1">
+<img alt="_images/tutorial.png" src="_images/tutorial.png" />
+<p class="caption"><span class="caption-text">DSDPy user interface</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
+<div class="section" id="input">
+<h3>Input<a class="headerlink" href="#input" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>DSD model</strong> tab accepts the text input in the form described in <a class="reference external" href="https://dsdpy.readthedocs.io/en/latest/tutorial.html#creating-your-own-input">DSDPy manual</a>.</p></li>
+</ol>
+<div class="figure align-center" id="id2">
+<a class="reference internal image-reference" href="_images/dsd_model.png"><img alt="_images/dsd_model.png" src="_images/dsd_model.png" style="width: 421.0px; height: 1007.0px;" /></a>
+<p class="caption"><span class="caption-text">DSD model tab</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Rendering options</strong> allows to choose the rendering speed and precision and used layout.</p></li>
+</ol>
+<ul class="simple">
+<li><p><strong>Drawing precision</strong> correspond to the iteration number that the simulated annealing algorithm starts with. Greater values yield better rendering results but the rendering process takes more time</p></li>
+<li><p><strong>Straight-line layout</strong> draws a planar planar graph with straight lines. The current implementation of the algorithm contains a bug in the augmentation module and therefore some species may contain unexpected crossings. Moreover, user might want to render a species that is not planar. In that case, try <strong>Orthogonal layout</strong>, which draws a any graph with straight lines (with the note that the underlying graph is assumed to have edges bending 90 degrees, therefore crossings may appear in a straight-line interpretation)</p></li>
+</ul>
+<div class="figure align-center" id="id3">
+<a class="reference internal image-reference" href="_images/render_options.png"><img alt="_images/render_options.png" src="_images/render_options.png" style="width: 421.0px; height: 570.0px;" /></a>
+<p class="caption"><span class="caption-text">Rendering options tab</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+<div class="section" id="simulation">
+<h3>Simulation<a class="headerlink" href="#simulation" title="Permalink to this headline">¶</a></h3>
+<div class="figure align-center" id="id4">
+<a class="reference internal image-reference" href="_images/generate_simulate.png"><img alt="_images/generate_simulate.png" src="_images/generate_simulate.png" style="width: 421.0px; height: 169.0px;" /></a>
+<p class="caption"><span class="caption-text">Simulation buttons group</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="id5">
+<a class="reference internal image-reference" href="_images/options.png"><img alt="_images/options.png" src="_images/options.png" style="width: 421.0px; height: 169.0px;" /></a>
+<p class="caption"><span class="caption-text">Simulation options tab</span><a class="headerlink" href="#id5" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple">
+<li><p><strong>Generate</strong> button starts the reaction network generation</p></li>
+<li><p><strong>Simulate</strong> button starts the simulation - choose the mode from the combo box (stochastic / deterministic)</p></li>
+<li><p><strong>Simulation options</strong> tab provides settings for threshold of iterations in reaction network generation</p></li>
+</ol>
+</div>
+<div class="section" id="output">
+<h3>Output<a class="headerlink" href="#output" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Input view</strong> tab displays the parsed input species to the DSDPy. <strong>Output view</strong> tab displays the parsed output species from the DSDPy.</p></li>
+</ol>
+<ul class="simple">
+<li><p>save the views as a PNG with save button</p></li>
+</ul>
+<div class="figure align-center" id="id6">
+<img alt="_images/render.png" src="_images/render.png" />
+<p class="caption"><span class="caption-text">Rendered DSD species</span><a class="headerlink" href="#id6" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p><strong>Network</strong> tab displays the chemical reaction network</p></li>
+</ol>
+<ul class="simple">
+<li><p>choose the network layout from the options in the combo box</p></li>
+<li><p>zoom and pan to navigate through the network</p></li>
+</ul>
+<div class="figure align-center" id="id7">
+<img alt="_images/network.png" src="_images/network.png" />
+<p class="caption"><span class="caption-text">Network tab after clicking Generate button</span><a class="headerlink" href="#id7" title="Permalink to this image">¶</a></p>
+</div>
+<ul class="simple">
+<li><p>click on the species’ name to view the species</p></li>
+<li><p>click on the reaction name to view the reactants, products and reaction rate of the reaction</p></li>
+</ul>
+<div class="figure align-center" id="id8">
+<img alt="_images/reaction.png" src="_images/reaction.png" />
+<p class="caption"><span class="caption-text">Reaction window after clicking on a reaction node</span><a class="headerlink" href="#id8" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><strong>Simulation plot</strong> tab displays BNG simulation plot</p></li>
+</ol>
+<div class="figure align-center" id="id9">
+<img alt="_images/simulation.png" src="_images/simulation.png" />
+<p class="caption"><span class="caption-text">Simulation tab after clicking Simulate button</span><a class="headerlink" href="#id9" title="Permalink to this image">¶</a></p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><strong>Text output</strong> tab displays the text output from the DSDPy</p></li>
+</ol>
+<div class="figure align-center" id="id10">
+<img alt="_images/text.png" src="_images/text.png" />
+<p class="caption"><span class="caption-text">Text output tab after clicking Generate button</span><a class="headerlink" href="#id10" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to DSDrender’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mainmodules.html" class="btn btn-neutral float-right" title="Main modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Malgorzata Nowicka.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
