@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -march=native -O3 -DNDEBUG  -rdynamic CMakeFiles/ex-orthogonal.dir/doc/examples/layout/orthogonal.cpp.o  -o ../doc/examples/layout/ex-orthogonal libOGDF.a libCOIN.a -lpthread 

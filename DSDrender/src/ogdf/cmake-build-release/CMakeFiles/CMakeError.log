@@ -1,0 +1,31 @@
+Performing C++ SOURCE FILE Test has_mallinfo2 failed with the following output:
+Change Dir: /home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_9ee3e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_9ee3e.dir/build.make CMakeFiles/cmTC_9ee3e.dir/build
+make[1]: Entering directory '/home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_9ee3e.dir/src.cxx.o
+/usr/bin/c++    -fPIC -march=native -Dhas_mallinfo2   -o CMakeFiles/cmTC_9ee3e.dir/src.cxx.o -c /home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp/src.cxx
+/home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp/src.cxx: In function ‘int main()’:
+/home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp/src.cxx:4:19: error: variable ‘main()::mallinfo2 mi’ has initializer but incomplete type
+  struct mallinfo2 mi = mallinfo2();
+                   ^~
+/home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp/src.cxx:4:34: error: invalid use of incomplete type ‘struct main()::mallinfo2’
+  struct mallinfo2 mi = mallinfo2();
+                                  ^
+/home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp/src.cxx:4:9: note: forward declaration of ‘struct main()::mallinfo2’
+  struct mallinfo2 mi = mallinfo2();
+         ^~~~~~~~~
+CMakeFiles/cmTC_9ee3e.dir/build.make:65: recipe for target 'CMakeFiles/cmTC_9ee3e.dir/src.cxx.o' failed
+make[1]: *** [CMakeFiles/cmTC_9ee3e.dir/src.cxx.o] Error 1
+make[1]: Leaving directory '/home/vinay/Documents/dsdui_test/DSDui/src/ogdf/cmake-build-release/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_9ee3e/fast' failed
+make: *** [cmTC_9ee3e/fast] Error 2
+
+Source file was:
+
+#include <malloc.h>
+int main() {
+	struct mallinfo2 mi = mallinfo2();
+	return 0;
+}

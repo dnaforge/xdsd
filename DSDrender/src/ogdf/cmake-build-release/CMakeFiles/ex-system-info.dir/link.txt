@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -march=native -O3 -DNDEBUG  -rdynamic CMakeFiles/ex-system-info.dir/doc/examples/special/system-info.cpp.o  -o ../doc/examples/special/ex-system-info libOGDF.a libCOIN.a -lpthread 
