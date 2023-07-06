@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -march=native -O3 -DNDEBUG  -rdynamic CMakeFiles/ex-check-build-mode.dir/doc/examples/special/check-build-mode.cpp.o  -o ../doc/examples/special/ex-check-build-mode libOGDF.a libCOIN.a -lpthread 

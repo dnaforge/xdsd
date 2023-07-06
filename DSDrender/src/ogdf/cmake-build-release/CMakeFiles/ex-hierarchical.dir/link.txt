@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -march=native -O3 -DNDEBUG  -rdynamic CMakeFiles/ex-hierarchical.dir/doc/examples/layout/hierarchical.cpp.o  -o ../doc/examples/layout/ex-hierarchical libOGDF.a libCOIN.a -lpthread 

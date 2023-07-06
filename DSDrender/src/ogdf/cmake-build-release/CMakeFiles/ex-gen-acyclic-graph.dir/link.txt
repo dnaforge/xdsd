@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -march=native -O3 -DNDEBUG  -rdynamic CMakeFiles/ex-gen-acyclic-graph.dir/doc/examples/basic/gen-acyclic-graph.cpp.o  -o ../doc/examples/basic/ex-gen-acyclic-graph libOGDF.a libCOIN.a -lpthread 

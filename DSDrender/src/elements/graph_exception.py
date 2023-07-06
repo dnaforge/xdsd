@@ -1,2 +1,0 @@
-class GraphException(Exception):
-    pass

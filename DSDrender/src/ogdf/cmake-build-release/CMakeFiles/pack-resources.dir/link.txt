@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC -march=native -O3 -DNDEBUG  -rdynamic CMakeFiles/pack-resources.dir/test/src/pack-resources.cpp.o  -o test/pack-resources 
