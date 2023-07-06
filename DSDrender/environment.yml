@@ -1,4 +1,4 @@
-name: DSDrender
+name: DSDui
 channels:
   - anaconda
   - alubbock

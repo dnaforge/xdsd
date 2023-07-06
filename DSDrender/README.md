@@ -1,10 +1,10 @@
-# DSDrender
+# DSDui
 Graphical user interface for [DSDPy](https://github.com/ashleylst/DSDPy) package.
 ### Dependencies
 1. To create the Anaconda environment:
 ```
 conda env create -f environment.yml
-conda activate DSDrender
+conda activate DSDui
 dot -c
 ````
 
