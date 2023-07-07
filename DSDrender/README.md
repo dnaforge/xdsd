@@ -1,10 +1,10 @@
-# DSDui
+# DSDrender
 Graphical user interface for [DSDPy](https://github.com/ashleylst/DSDPy) package.
 ### Dependencies
 1. To create the Anaconda environment:
 ```
 conda env create -f environment.yml
-conda activate DSDui
+conda activate DSDrender
 dot -c
 ````
 
@@ -31,7 +31,7 @@ or
 ```
 cd ogdf
 mkdir ./cmake-build-release && cd ./cmake-build-release
-cmake -DCMAKE_CXX_FLAGS="-fPIC" ..
+cmake ..
 make -j 8
 mkdir ./lib && cd ./lib && echo "Created new lib directory"
 ar -x ../libOGDF.a
