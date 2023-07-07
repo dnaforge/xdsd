@@ -31,7 +31,8 @@ or
 ```
 cd ogdf
 mkdir ./cmake-build-release && cd ./cmake-build-release
-cmake ..
+# build using -fPIC flag
+cmake -DCMAKE_CXX_FLAGS="-fPIC" ..
 make -j 8
 mkdir ./lib && cd ./lib && echo "Created new lib directory"
 ar -x ../libOGDF.a
