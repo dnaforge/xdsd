@@ -1,4 +1,4 @@
-from math import atan2, pi
+from math import atan2, pi, sqrt
 
 from numpy import dot
 from numpy.linalg import norm
@@ -8,7 +8,7 @@ color_id = -1
 
 DOMAIN_LEN = 50  # domain length
 TOEHOLD_LEN = 25
-BOND_DIST = 25  # distance between paired domains
+BOND_DIST = DOMAIN_LEN / (sqrt(2))  # distance between paired domains
 
 START_TEMP_CONST = 10
 INITIAL_ITER_NO = 100
@@ -19,15 +19,27 @@ INCR_CONST = 10
 
 STRAIGHT_LINES = True
 
-COLORS = ["#fe4a49", "#2ab7ca", "#fed766", "#1bbe7d", "#9284e3", "#694f51", "#341bc6", "#2f851c", "#ff9f31", "#81869b"]
+COLORS = [
+    "#fe4a49",
+    "#2ab7ca",
+    "#fed766",
+    "#1bbe7d",
+    "#9284e3",
+    "#694f51",
+    "#341bc6",
+    "#2f851c",
+    "#ff9f31",
+    "#81869b",
+]
 
 
 def get_side(vector, point):
     # on which side of the vector the point is
     # compute the cross product
     # 𝑑=(𝑥−𝑥1)(𝑦2−𝑦1)−(𝑦−𝑦1)(𝑥2−𝑥1)
-    return (point[0] - vector[0][0]) * (vector[1][1] - vector[0][1]) - (point[1] - vector[0][1]) * (
-                vector[1][0] - vector[0][0])
+    return (point[0] - vector[0][0]) * (vector[1][1] - vector[0][1]) - (
+        point[1] - vector[0][1]
+    ) * (vector[1][0] - vector[0][0])
 
 
 def get_cos(vector1, vector2):
@@ -42,7 +54,7 @@ def get_next_color():
 
 def get_color(i):
     if i == -1:
-        return '#b9c0bd'
+        return "#b9c0bd"
     else:
         return COLORS[int(i) % len(COLORS)]
 
@@ -63,14 +75,18 @@ def get_id():
 
 
 def get_angle_negative(vector1, vector2):
-    dot = vector1[0] * vector2[0] + vector1[1] * vector2[1]  # dot product between [x1, y1] and [x2, y2]
+    dot = (
+        vector1[0] * vector2[0] + vector1[1] * vector2[1]
+    )  # dot product between [x1, y1] and [x2, y2]
     det = vector1[0] * vector2[1] - vector2[0] * vector1[1]  # determinant
     angle = atan2(det, dot)
     return angle
 
 
 def get_angle(vector1, vector2):
-    dot = vector1[0] * vector2[0] + vector1[1] * vector2[1]  # dot product between [x1, y1] and [x2, y2]
+    dot = (
+        vector1[0] * vector2[0] + vector1[1] * vector2[1]
+    )  # dot product between [x1, y1] and [x2, y2]
     det = vector1[0] * vector2[1] - vector2[0] * vector1[1]  # determinant
     angle = atan2(det, dot)
     if angle < 0:
@@ -88,7 +104,7 @@ def euclidean_dist(point1, point2):
     x = point2[0] - point1[0]
     y = point2[1] - point1[1]
 
-    return (x ** 2 + y ** 2) ** 0.5
+    return (x**2 + y**2) ** 0.5
 
 
 def get_vector_length(vector):
@@ -104,7 +120,9 @@ def get_radius(n_domains, n_strands):
 
 
 def get_loop_radius(n, d):
-    r = (DOMAIN_LEN * n + d) / (2 * pi)  # approximation of the circumference by addition of the chord
+    r = (DOMAIN_LEN * n + d) / (
+        2 * pi
+    )  # approximation of the circumference by addition of the chord
     return r
 
 

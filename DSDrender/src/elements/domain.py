@@ -5,7 +5,14 @@ from PyQt5.QtGui import QPen, QPainter, QFont, QColor
 from PyQt5.QtWidgets import QGraphicsItem
 
 from src.elements.element import Element
-from src.utils.config import get_id, DOMAIN_LEN, TOEHOLD_LEN, get_vector_length, get_global_angle
+from src.utils.config import (
+    get_id,
+    DOMAIN_LEN,
+    TOEHOLD_LEN,
+    BOND_DIST,
+    get_vector_length,
+    get_global_angle,
+)
 
 
 class Domain(Element):
@@ -37,7 +44,7 @@ class Domain(Element):
         return self.bond
 
     def get_name_stem(self):
-        pair_idx = self.name.find('*')
+        pair_idx = self.name.find("*")
         if pair_idx != -1:
             return self.name[:pair_idx]
         return self.name
@@ -69,7 +76,12 @@ class DomainGraphicsItem(QGraphicsItem):
         up = min(self.start[1], self.end[1])
         down = max(self.start[1], self.end[1])
 
-        return QRectF(left - margin, up - margin, right - left + 2 * margin, down - up + 2 * margin)
+        return QRectF(
+            left - margin,
+            up - margin,
+            right - left + 2 * margin,
+            down - up + 2 * margin,
+        )
 
     def paint(self, painter, option, widget):
         pen = QPen()
@@ -77,21 +89,29 @@ class DomainGraphicsItem(QGraphicsItem):
         pen.setColor(QColor(self.color))
         painter.setPen(pen)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setFont(QFont('Arial', 17, QFont.DemiBold))
+        painter.setFont(QFont("Arial", 17, QFont.DemiBold))
 
-        painter.drawLine(self.start[0], self.start[1], self.end[0], self.end[1])
+        painter.drawLine(
+            int(self.start[0]), int(self.start[1]), int(self.end[0]), int(self.end[1])
+        )
         if self.last:
             arrow = QLineF()
-            arrow.setP1(QPointF(self.end[0], self.end[1]))
+            arrow.setP1(QPointF(int(self.end[0]), int(self.end[1])))
             angle = degrees((get_global_angle(self.dir)))
             arrow.setAngle(angle - 135)
             arrow.setLength(10)
             painter.drawLine(arrow)
-        text_vector = [(self.start[0] + self.end[0]) / 2,
-                       (self.start[1] + self.end[1]) / 2]
+        text_vector = [
+            (self.start[0] + self.end[0]) / 2,
+            (self.start[1] + self.end[1]) / 2,
+        ]
         pen.setColor(QColor(0, 0, 0))
         painter.setPen(pen)
-        painter.drawText(text_vector[0] - 15, text_vector[1] + 15, self.name)
+        painter.drawText(
+            int(text_vector[0] - BOND_DIST / 2),
+            int(text_vector[1] + BOND_DIST / 2),
+            self.name,
+        )
 
 
 class BondGraphicsItem(QGraphicsItem):
@@ -102,8 +122,14 @@ class BondGraphicsItem(QGraphicsItem):
     def __init__(self, domain1, domain2, name):
         QGraphicsItem.__init__(self, parent=None)
 
-        self.start = [(domain1[0][0] + domain1[1][0]) / 2, (domain1[0][1] + domain1[1][1]) / 2]
-        self.end = [(domain2[0][0] + domain2[1][0]) / 2, (domain2[0][1] + domain2[1][1]) / 2]
+        self.start = [
+            (domain1[0][0] + domain1[1][0]) / 2,
+            (domain1[0][1] + domain1[1][1]) / 2,
+        ]
+        self.end = [
+            (domain2[0][0] + domain2[1][0]) / 2,
+            (domain2[0][1] + domain2[1][1]) / 2,
+        ]
         # self.start = domain1
         # self.end = domain2
         self.name = name
@@ -121,10 +147,18 @@ class BondGraphicsItem(QGraphicsItem):
     def paint(self, painter, option, widget):
         painter.setPen(QPen(Qt.black, 1, Qt.DashLine, Qt.RoundCap, Qt.RoundJoin))
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setFont(QFont('Arial', 17, QFont.DemiBold))
+        painter.setFont(QFont("Arial", 17, QFont.DemiBold))
 
-        painter.drawLine(self.start[0], self.start[1], self.end[0], self.end[1])
-        text_vector = [(self.start[0] + self.end[0]) / 2,
-                       (self.start[1] + self.end[1]) / 2]
+        painter.drawLine(
+            int(self.start[0]), int(self.start[1]), int(self.end[0]), int(self.end[1])
+        )
+        text_vector = [
+            (self.start[0] + self.end[0]) / 2,
+            (self.start[1] + self.end[1]) / 2,
+        ]
         painter.setPen(QPen(Qt.black, 1))
-        painter.drawText(text_vector[0] - 15, text_vector[1] + 15, self.name)
+        painter.drawText(
+            int(text_vector[0] - BOND_DIST / 2),
+            int(text_vector[1] + BOND_DIST / 2),
+            self.name,
+        )

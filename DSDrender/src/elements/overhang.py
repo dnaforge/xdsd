@@ -5,7 +5,13 @@ from PyQt5.QtGui import QPen, QPainter, QFont, QColor
 from PyQt5.QtWidgets import QGraphicsItem
 
 from src.elements.element import Element
-from src.utils.config import get_id, get_global_angle, get_color, DOMAIN_LEN, TOEHOLD_LEN
+from src.utils.config import (
+    get_id,
+    get_global_angle,
+    get_color,
+    DOMAIN_LEN,
+    TOEHOLD_LEN,
+)
 
 
 class Overhang(Element):
@@ -23,7 +29,7 @@ class Overhang(Element):
         for domain in self.domains:
             self.domain_len += domain.domain_len
         self.bond = -1
-        self.name = ''
+        self.name = ""
         self.first = first
         self.last = last
 
@@ -63,12 +69,17 @@ class OverhangGraphicsItem(QGraphicsItem):
         up = min(self.p1.y(), self.p2.y())
         down = max(self.p1.y(), self.p2.y())
 
-        return QRectF(left - margin, up - margin, right - left + 2 * margin, down - up + 2 * margin)
+        return QRectF(
+            left - margin,
+            up - margin,
+            right - left + 2 * margin,
+            down - up + 2 * margin,
+        )
 
     def paint(self, painter, option, widget):
         painter.setPen(QPen(QColor(self.color), 4))
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setFont(QFont('Arial', 17, QFont.DemiBold))
+        painter.setFont(QFont("Arial", 17, QFont.DemiBold))
 
         # starting point from previous domain/strand beginning
         # line = QLineF()
@@ -91,7 +102,11 @@ class OverhangGraphicsItem(QGraphicsItem):
             new_p1 = line.p2()
             painter.drawLine(line)
             painter.setPen(QPen(Qt.black, 4))
-            painter.drawText((line.x1() + line.x2()) / 2 + 7, (line.y1() + line.y2()) / 2 + 7, domain.name)
+            painter.drawText(
+                int((line.x1() + line.x2()) / 2 + 7),
+                int((line.y1() + line.y2()) / 2 + 7),
+                domain.name,
+            )
             # line = QLineF()
             # line.setP1(new_p1)
             # line.setAngle(self.angle)
