@@ -90,7 +90,9 @@ class Graph:
                     graph_loops[domain] = (prev_node, node)
                 # connect with neighbors
                 edge = self.g.newEdge(prev_node, node)
-                self.ga.label[edge] = "$" + str(domain.bond) + "$" + str(domain.get_id())
+                self.ga.label[edge] = (
+                    "$" + str(domain.bond) + "$" + str(domain.get_id())
+                )
                 prev_node = node
 
         # connect the bounded domains
@@ -100,15 +102,15 @@ class Graph:
             edge = self.g.searchEdge(first_pair[0], second_pair[1])
             if not edge:
                 edge = self.g.newEdge(first_pair[0], second_pair[1])
-                self.ga.label[edge] = '!' + str(bond)
+                self.ga.label[edge] = "!" + str(bond)
             else:
-                self.ga.label[edge] += '!' + str(bond)
+                self.ga.label[edge] += "!" + str(bond)
             edge = self.g.searchEdge(first_pair[1], second_pair[0])
             if not edge:
                 edge = self.g.newEdge(first_pair[1], second_pair[0])
-                self.ga.label[edge] = '!' + str(bond)
+                self.ga.label[edge] = "!" + str(bond)
             else:
-                self.ga.label[edge] += '!' + str(bond)
+                self.ga.label[edge] += "!" + str(bond)
 
         # PlanarDrawLayout accepts only planar graphs, crashes in other case
         # PlanarizationLayout accepts non-planar graphs, but works with the orthogonal layout, so crossings possible
@@ -136,8 +138,18 @@ class Graph:
                 bl.call(self.ga)
                 cross_after = bl.edgeCrossings(self.ga)
                 if cross_after != 0:
-                    raise GraphException(str(cross_after) + " edge(s) crossing in " + self.species.name)
-                energy_history = optimize(self.g, self.ga, graph_domain_pairs, graph_loops, self.signals, self.species_no, self.stop)
+                    raise GraphException(
+                        str(cross_after) + " edge(s) crossing in " + self.species.name
+                    )
+                energy_history = optimize(
+                    self.g,
+                    self.ga,
+                    graph_domain_pairs,
+                    graph_loops,
+                    self.signals,
+                    self.species_no,
+                    self.stop,
+                )
             #     self.save_energy_plot(self.species.name, energy_history)
         except GraphException as ge:
             # try to only maximize the external face
@@ -157,9 +169,23 @@ class Graph:
                 bl.reqlength(src.utils.config.DOMAIN_LEN / 2.5)
                 bl.call(self.ga)
                 cross_after = bl.edgeCrossings(self.ga)
-                self.errors.append(GraphException(
-                    "Retry the embedding. " + str(cross_after) + " edge(s) crossing in " + self.species.name))
-                energy_history = optimize(self.g, self.ga, graph_domain_pairs, graph_loops, self.signals, self.species_no, self.stop)
+                self.errors.append(
+                    GraphException(
+                        "Retry the embedding. "
+                        + str(cross_after)
+                        + " edge(s) crossing in "
+                        + self.species.name
+                    )
+                )
+                energy_history = optimize(
+                    self.g,
+                    self.ga,
+                    graph_domain_pairs,
+                    graph_loops,
+                    self.signals,
+                    self.species_no,
+                    self.stop,
+                )
                 # self.save_energy_plot(self.species.name, energy_history)
 
     def save_energy_plot(self, name, energy_history):
@@ -178,6 +204,13 @@ class Graph:
         self.ax.plot(energy_history[1], label="loops")
         self.ax.plot(energy_history[2], label="domains")
         self.ax.plot(energy_history[3], label="pairs")
-        self.ax.legend(bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", borderaxespad=0)
-        self.fig.savefig("./plots/energy_function_" + str(name) + ".png", dpi=200, pad_inches=0.1, bbox_inches='tight')
+        self.ax.legend(
+            bbox_to_anchor=(0, 1.02, 1, 0.2), loc="lower left", borderaxespad=0
+        )
+        self.fig.savefig(
+            "./plots/energy_function_" + str(name) + ".png",
+            dpi=200,
+            pad_inches=0.1,
+            bbox_inches="tight",
+        )
         plt.cla()

@@ -5,7 +5,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.7
+  - python=3.10
   - bidict
   - pysb
   - networkx
@@ -13,7 +13,8 @@ dependencies:
   - pyqt
   - graphviz
   - pygraphviz
+  - cppyy
   - pip
   - pip:
-    - ogdf-python
-    - pydot
+      - ogdf-python
+      - pydot

@@ -801,8 +801,8 @@ class QGraphicsDoubleLineItem(QGraphicsItem):
         pen.setColor(QColor(self.color1))
         painter.setPen(pen)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.drawLine(self.start[0], self.start[1], self.mid[0], self.mid[1])
+        painter.drawLine(int(self.start[0]), int(self.start[1]), int(self.mid[0]), int(self.mid[1]))
 
         pen.setColor(QColor(self.color2))
         painter.setPen(pen)
-        painter.drawLine(self.mid[0], self.mid[1], self.end[0], self.end[1])
+        painter.drawLine(int(self.mid[0]), int(self.mid[1]), int(self.end[0]), int(self.end[1]))

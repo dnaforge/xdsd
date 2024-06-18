@@ -3,14 +3,23 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QProgressBar, QPushBut
 
 
 class ProgressWindow(QWidget):
-    def __init__(self, optimization_id, signal_close, signal_update, max_progress, max_species, stop, text=""):
+    def __init__(
+        self,
+        optimization_id,
+        signal_close,
+        signal_update,
+        max_progress,
+        max_species,
+        stop,
+        text="",
+    ):
         super().__init__()
 
         self.text = text
         self.max_species = max_species
         self.stop = stop
 
-        self.setWindowTitle(' ')
+        self.setWindowTitle(" ")
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         signal_close.connect(self.close)
         signal_update.connect(self.update_progress)
@@ -30,7 +39,7 @@ class ProgressWindow(QWidget):
         layout.addWidget(self.progress_bar)
 
         self.stop_button = QPushButton()
-        self.stop_button.setText('Stop')
+        self.stop_button.setText("Stop")
         self.stop_button.clicked.connect(self.close_window)
         layout.addWidget(self.stop_button)
 
@@ -38,8 +47,10 @@ class ProgressWindow(QWidget):
 
     def update_progress(self, progress, species_no):
         if species_no != -1:
-            self.label.setText(self.text+' (' + str(species_no) + '/' + str(self.max_species) + ')')
-        self.progress_bar.setValue((self.max_progress - progress) * self.const)
+            self.label.setText(
+                self.text + " (" + str(species_no) + "/" + str(self.max_species) + ")"
+            )
+        self.progress_bar.setValue(int((self.max_progress - progress) * self.const))
 
     def close_window(self):
         self.stop()

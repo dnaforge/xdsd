@@ -64,17 +64,24 @@ def optimize(G, GA, graph_domain_pairs, graph_loops, signals, species_no, stop):
 
     # main loop of the simulated annealing
     while T >= T_end and not stop[0]:
-        state, energy, best_state, best_energy, energy_history = optimize_one_iteration(state, energy, increment, T,
-                                                                                        best_state, best_energy,
-                                                                                        iterations_number,
-                                                                                        graph_domain_pairs,
-                                                                                        graph_loops, energy_history,
-                                                                                        length_factor)
+        state, energy, best_state, best_energy, energy_history = optimize_one_iteration(
+            state,
+            energy,
+            increment,
+            T,
+            best_state,
+            best_energy,
+            iterations_number,
+            graph_domain_pairs,
+            graph_loops,
+            energy_history,
+            length_factor,
+        )
 
         # decrease temperature
         T *= src.utils.config.COOL_CONST
         # increase the influence of domain and loop length
-        length_factor = 1 + (T-T_end)/(src.utils.config.START_TEMP_CONST-T_end)
+        length_factor = 1 + (T - T_end) / (src.utils.config.START_TEMP_CONST - T_end)
         # decrease the number of iterations at the given temperature level
         iterations_number = int(0.935 * iterations_number)
 
@@ -96,8 +103,19 @@ def optimize(G, GA, graph_domain_pairs, graph_loops, signals, species_no, stop):
     return energy_history
 
 
-def optimize_one_iteration(state, energy, increment, T, best_state, best_energy, iterations_number, graph_domain_pairs,
-                           graph_loops, energy_history, length_factor):
+def optimize_one_iteration(
+    state,
+    energy,
+    increment,
+    T,
+    best_state,
+    best_energy,
+    iterations_number,
+    graph_domain_pairs,
+    graph_loops,
+    energy_history,
+    length_factor,
+):
     """
     Performs state change in the given temperature in simulated annealing
 
@@ -117,7 +135,9 @@ def optimize_one_iteration(state, energy, increment, T, best_state, best_energy,
         node, dx, dy = move(state, increment)
         set_bond_targets(state[1], graph_domain_pairs)
         # energy components: distance between the ends of the loops, domain lengths, pair placement
-        next_energy, components = E(state, graph_domain_pairs, graph_loops, length_factor)
+        next_energy, components = E(
+            state, graph_domain_pairs, graph_loops, length_factor
+        )
         diff = next_energy - energy
 
         if diff <= 0 or uniform() < exp(-diff / T):
@@ -214,13 +234,23 @@ def set_bond_targets(GA, graph_domain_pairs):
         second_node1 = [GA.x(second_pair[0]), GA.y(second_pair[0])]
 
         # get the candidates for the bond targets and the vectors to them from the domains
-        first_candidate, first_perp = get_bond_target_candidate(first_node1, first_node2)
-        second_candidate, second_perp = get_bond_target_candidate(second_node1, second_node2)
+        first_candidate, first_perp = get_bond_target_candidate(
+            first_node1, first_node2
+        )
+        second_candidate, second_perp = get_bond_target_candidate(
+            second_node1, second_node2
+        )
 
         # check how many cosines are positive == if the shape between the pairs is a valid quadrilateral
         # (where only one of the angles can be greater than 180 degrees)
-        convexity = get_pair_convexity(first_candidate, second_candidate,
-                                       first_node1, first_node2, second_node1, second_node2)
+        convexity = get_pair_convexity(
+            first_candidate,
+            second_candidate,
+            first_node1,
+            first_node2,
+            second_node1,
+            second_node2,
+        )
         # flip the bond side in both domains
         if convexity < 3:
             first_perp = [-first_perp[0], -first_perp[1]]
@@ -243,15 +273,40 @@ def write_bond_targets(GA, bond, pair, perp):
     if len(GA.label[pair[0]]) == 0 or len(GA.label[pair[0]]) > 200:
         GA.label[pair[0]] = "!" + bond + " " + str(perp[0]) + " " + str(perp[1])
     else:
-        GA.label[pair[0]] = GA.label[pair[0]] + " " + "!" + bond + " " + str(perp[0]) + " " + str(perp[1])
+        GA.label[pair[0]] = (
+            GA.label[pair[0]]
+            + " "
+            + "!"
+            + bond
+            + " "
+            + str(perp[0])
+            + " "
+            + str(perp[1])
+        )
 
     if len(GA.label[pair[1]]) == 0 or len(GA.label[pair[1]]) > 200:
         GA.label[pair[1]] = "!" + bond + " " + str(perp[0]) + " " + str(perp[1])
     else:
-        GA.label[pair[1]] = GA.label[pair[1]] + " " + "!" + bond + " " + str(perp[0]) + " " + str(perp[1])
+        GA.label[pair[1]] = (
+            GA.label[pair[1]]
+            + " "
+            + "!"
+            + bond
+            + " "
+            + str(perp[0])
+            + " "
+            + str(perp[1])
+        )
 
 
-def get_pair_convexity(first_candidate, second_candidate, first_node1, first_node2, second_node1, second_node2):
+def get_pair_convexity(
+    first_candidate,
+    second_candidate,
+    first_node1,
+    first_node2,
+    second_node1,
+    second_node2,
+):
     """
     Check how many cosines of the angles between vector from the node to the paired node and the node to the candidate place for the paired node are positive i.e. if the shape between the pairs is a valid quadrilateral (where only one of the angles can be greater than 180 degrees).
 
@@ -263,8 +318,11 @@ def get_pair_convexity(first_candidate, second_candidate, first_node1, first_nod
     :param second_node2: Node denoting the end of the first second in the pair
     :return:
     """
-    return get_side_convexity(first_candidate, first_node1, first_node2, second_node1, second_node2) + \
-           get_side_convexity(second_candidate, second_node1, second_node2, first_node1, first_node2)
+    return get_side_convexity(
+        first_candidate, first_node1, first_node2, second_node1, second_node2
+    ) + get_side_convexity(
+        second_candidate, second_node1, second_node2, first_node1, first_node2
+    )
 
 
 def get_side_convexity(candidate, first_node1, first_node2, second_node1, second_node2):
@@ -279,10 +337,19 @@ def get_side_convexity(candidate, first_node1, first_node2, second_node1, second
     :return:
     """
     # the first vector to candidate is the same for both ends of the domain
-    return int(src.utils.config.get_cos([candidate[0] - first_node1[0], candidate[1] - first_node1[1]],
-                                        [second_node2[0] - first_node1[0], second_node2[1] - first_node1[1]]) > 0) + \
-           int(src.utils.config.get_cos([candidate[0] - first_node1[0], candidate[1] - first_node1[1]],
-                                        [second_node1[0] - first_node2[0], second_node1[1] - first_node2[1]]) > 0)
+    return int(
+        src.utils.config.get_cos(
+            [candidate[0] - first_node1[0], candidate[1] - first_node1[1]],
+            [second_node2[0] - first_node1[0], second_node2[1] - first_node1[1]],
+        )
+        > 0
+    ) + int(
+        src.utils.config.get_cos(
+            [candidate[0] - first_node1[0], candidate[1] - first_node1[1]],
+            [second_node1[0] - first_node2[0], second_node1[1] - first_node2[1]],
+        )
+        > 0
+    )
 
 
 def get_bond_target_candidate(node1, node2):
@@ -294,8 +361,10 @@ def get_bond_target_candidate(node1, node2):
     """
     direction = [node2[0] - node1[0], node2[1] - node1[1]]
     direction_len = src.utils.config.get_vector_length(direction)
-    direction_norm = [direction[0] / direction_len * src.utils.config.DOMAIN_LEN / sqrt(2),
-                      direction[1] / direction_len * src.utils.config.DOMAIN_LEN / sqrt(2)]
+    direction_norm = [
+        direction[0] / direction_len * src.utils.config.BOND_DIST,
+        direction[1] / direction_len * src.utils.config.BOND_DIST,
+    ]
     perp = [-direction_norm[1], direction_norm[0]]
 
     return [node1[0] + perp[0], node1[1] + perp[1]], perp
